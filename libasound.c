@@ -548,7 +548,7 @@ int
 snd_pcm_hw_params_get_channels_max(const snd_pcm_hw_params_t *params, unsigned int *val)
 {
    // FIXME: need to store stream info in params
-   unsigned int max = (unsigned int)~0;
+   unsigned int max = 0;
    for (int i = 0; i < SIO_NCHAN; ++i) {
       if (!(params->cap.confs[0].pchan & (1 << i)))
          continue;
