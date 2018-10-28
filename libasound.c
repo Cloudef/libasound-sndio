@@ -271,7 +271,7 @@ snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
    params->cap = pcm->cap;
    sio_initpar(&params->par);
    copy_important_params(&params->par, &pcm->hw.par);
-   fprintf(stderr, "rate: %u, round: %u, appbufsz: %u, bufsz: %u\n", params->par.rate, params->par.round, params->par.appbufsz, params->par.bufsz);
+   WARNX("rate: %u, round: %u, appbufsz: %u", params->par.rate, params->par.round, params->par.appbufsz);
    return 0;
 }
 
@@ -294,7 +294,7 @@ snd_pcm_hw_params(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
       }
    }
 
-   fprintf(stderr, "rate: %u, round: %u, appbufsz: %u, bufsz: %u\n", pcm->hw.par.rate, pcm->hw.par.round, pcm->hw.par.appbufsz, pcm->hw.par.bufsz);
+   WARNX("rate: %u, round: %u, appbufsz: %u, bufsz: %u", pcm->hw.par.rate, pcm->hw.par.round, pcm->hw.par.appbufsz, pcm->hw.par.bufsz);
    return snd_pcm_prepare(pcm);
 }
 
