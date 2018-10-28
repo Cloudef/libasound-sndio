@@ -38,6 +38,14 @@ snd_strerror(int errnum)
    return "^";
 }
 
+snd_lib_error_handler_t snd_lib_error;
+
+int snd_lib_error_set_handler(snd_lib_error_handler_t handler)
+{
+   snd_lib_error = handler;
+   return 0;
+}
+
 struct _snd_config { char noop; } s_snd_config;
 struct _snd_config *snd_config = &s_snd_config;
 
