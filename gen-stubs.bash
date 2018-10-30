@@ -19,7 +19,7 @@ should_error()
 {
    # stubs that should return error value
    grep -Fqs "$(cat << EOF
-snd_card_
+_malloc
 snd_config_
 EOF
 )" <<<"$1"

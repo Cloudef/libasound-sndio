@@ -55,11 +55,6 @@ int snd_config_get_ctl_iface_ascii(const char *ascii) { WARNX1("stub"); return -
 int snd_config_get_ctl_iface(const snd_config_t *conf) { WARNX1("stub"); return -1; }
 int snd_names_list(const char *iface, snd_devname_t **list) { WARNX1("stub"); return 0; }
 void snd_names_list_free(snd_devname_t *list) { WARNX1("stub");  }
-int snd_card_load(int card) { WARNX1("stub"); return -1; }
-int snd_card_next(int *card) { WARNX1("stub"); return -1; }
-int snd_card_get_index(const char *name) { WARNX1("stub"); return -1; }
-int snd_card_get_name(int card, char **name) { WARNX1("stub"); return -1; }
-int snd_card_get_longname(int card, char **name) { WARNX1("stub"); return -1; }
 int snd_ctl_open(snd_ctl_t **ctl, const char *name, int mode) { WARNX1("stub"); return 0; }
 int snd_ctl_open_lconf(snd_ctl_t **ctl, const char *name, int mode, snd_config_t *lconf) { WARNX1("stub"); return 0; }
 int snd_ctl_open_fallback(snd_ctl_t **ctl, snd_config_t *root, const char *name, const char *orig_name, int mode) { WARNX1("stub"); return 0; }
@@ -545,8 +540,6 @@ int snd_pcm_hw_params_get_rate_numden(const snd_pcm_hw_params_t *params, unsigne
 int snd_pcm_hw_params_get_sbits(const snd_pcm_hw_params_t *params) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_get_fifo_size(const snd_pcm_hw_params_t *params) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_try_explain_failure(snd_pcm_t *pcm, snd_pcm_hw_params_t *fail, snd_pcm_hw_params_t *success, unsigned int depth, snd_output_t *out) { WARNX1("stub"); return 0; }
-int snd_pcm_hw_params_malloc(snd_pcm_hw_params_t **ptr) { WARNX1("stub"); return 0; }
-void snd_pcm_hw_params_free(snd_pcm_hw_params_t *obj) { WARNX1("stub");  }
 int snd_pcm_hw_params_get_access(const snd_pcm_hw_params_t *params, snd_pcm_access_t *_access) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_test_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_set_access_first(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t *_access) { WARNX1("stub"); return 0; }

@@ -49,6 +49,43 @@ int snd_lib_error_set_handler(snd_lib_error_handler_t handler)
 struct _snd_config { char noop; } s_snd_config;
 struct _snd_config *snd_config = &s_snd_config;
 
+int
+snd_card_load(int card)
+{
+   return 0;
+}
+
+int
+snd_card_next(int *card)
+{
+   if (card) {
+      *card = (*card == -1 ? 0 : -1);
+      return 0;
+   }
+   return -1;
+}
+
+int
+snd_card_get_index(const char *name)
+{
+   if (!strcmp(name, "default"))
+      return 0;
+   return -1;
+}
+
+int
+snd_card_get_name(int card, char **name)
+{
+   if (name) *name = "default";
+   return 0;
+}
+
+int snd_card_get_longname(int card, char **name)
+{
+   if (name) *name = "default";
+   return 0;
+}
+
 struct _snd_pcm_hint { char *name, *ioid; };
 
 int
@@ -495,6 +532,20 @@ size_t
 snd_pcm_format_mask_sizeof(void)
 {
    return sizeof(snd_pcm_format_mask_t);
+}
+
+int
+snd_pcm_hw_params_malloc(snd_pcm_hw_params_t **ptr)
+{
+   // OpenAL-soft uses this :(
+   *ptr = calloc(1, sizeof(**ptr));
+   return (*ptr ? 0 : -1);
+}
+
+void
+snd_pcm_hw_params_free(snd_pcm_hw_params_t *obj)
+{
+   free(obj);
 }
 
 void
