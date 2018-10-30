@@ -157,7 +157,7 @@ snd_pcm_open(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t stream, int mod
    if (!((*pcm)->hdl = device_open(*pcm, name, stream, mode)))
       return -1;
 
-   (*pcm)->name = name;
+   (*pcm)->name = (name ? name : "default");
    return (sio_getcap((*pcm)->hdl, &(*pcm)->cap) && sio_getpar((*pcm)->hdl, &(*pcm)->hw.par) ? 0 : -1);
 }
 
@@ -167,6 +167,12 @@ snd_pcm_close(snd_pcm_t *pcm)
    sio_close(pcm->hdl);
    free(pcm);
    return 0;
+}
+
+const char*
+snd_pcm_name(snd_pcm_t *pcm)
+{
+   return pcm->name;
 }
 
 int
@@ -190,6 +196,15 @@ snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
 #endif
 }
 
+snd_pcm_state_t
+snd_pcm_state(snd_pcm_t *pcm)
+{
+   if (pcm->started)
+      return SND_PCM_STATE_RUNNING;
+
+   return SND_PCM_STATE_OPEN;
+}
+
 snd_pcm_sframes_t
 snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 {
@@ -206,7 +221,15 @@ snd_pcm_sframes_t
 snd_pcm_avail_update(snd_pcm_t *pcm)
 {
    // FIXME: not correct, but fine since we force blocking for now
-   return snd_pcm_bytes_to_frames(pcm, pcm->hw.par.appbufsz);
+   return snd_pcm_bytes_to_frames(pcm, pcm->hw.par.bufsz);
+}
+
+int
+snd_pcm_delay(snd_pcm_t *pcm, snd_pcm_sframes_t *delayp)
+{
+   // FIXME: not correct, but fine since we force blocking for now
+   if (delayp) *delayp = 0;
+   return 0;
 }
 
 int
@@ -745,6 +768,23 @@ int
 snd_pcm_sw_params_current(snd_pcm_t *pcm, snd_pcm_sw_params_t *params)
 {
    *params = pcm->sw;
+   return 0;
+}
+
+int
+snd_pcm_set_params(snd_pcm_t *pcm, snd_pcm_format_t format, snd_pcm_access_t access, unsigned int channels, unsigned int rate, int soft_resample, unsigned int latency)
+{
+   snd_pcm_hw_params_t params;
+   return (!snd_pcm_hw_params_any(pcm, &params) && !snd_pcm_hw_params_set_format(pcm, &params, format) &&
+           !snd_pcm_hw_params_set_access(pcm, &params, access) && !snd_pcm_hw_params_set_channels(pcm, &params, channels) &&
+           !snd_pcm_hw_params_set_rate(pcm, &params, rate, 0) && !snd_pcm_hw_params(pcm, &params) ? 0 : -1);
+}
+
+int
+snd_pcm_get_params(snd_pcm_t *pcm, snd_pcm_uframes_t *buffer_size, snd_pcm_uframes_t *period_size)
+{
+   if (buffer_size) *buffer_size = pcm->hw.par.appbufsz;
+   if (period_size) *period_size = pcm->hw.par.round;
    return 0;
 }
 
