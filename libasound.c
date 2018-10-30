@@ -169,8 +169,8 @@ snd_pcm_close(snd_pcm_t *pcm)
 int
 snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
 {
+   snd_pcm_drain(pcm);
    sio_close(pcm->hdl);
-   pcm->started = false;
 
    if (!(pcm->hdl = device_open(pcm->name, pcm->stream, (nonblock ? SND_PCM_NONBLOCK : false))))
       return -1;
