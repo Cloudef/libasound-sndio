@@ -202,6 +202,13 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
    return snd_pcm_bytes_to_frames(pcm, sio_read(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, size)));
 }
 
+snd_pcm_sframes_t
+snd_pcm_avail_update(snd_pcm_t *pcm)
+{
+   // FIXME: not correct, but fine since we force blocking for now
+   return snd_pcm_bytes_to_frames(pcm, pcm->hw.par.appbufsz);
+}
+
 int
 snd_pcm_prepare(snd_pcm_t *pcm)
 {
