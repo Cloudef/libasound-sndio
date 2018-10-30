@@ -11,30 +11,36 @@ WARNINGS := -Wall -Wextra -Wpedantic -Wformat=2 -Wstrict-aliasing=3 -Wstrict-ove
 override CFLAGS ?= -g
 override CFLAGS += -std=c11 $(WARNINGS)
 override CPPFLAGS += -Iinclude
+override LDFLAGS += -fPIC
 
-libs = libasound.so
-libsymlinks = libasound.so.2 libasound.so.2.0.0
+libs = libasound.so.2.0.0
+libsymlinks = libasound.so.2 libasound.so
 pkgconfigs = alsa.pc
-all: $(libs)
-
-%.so:
-	$(LINK.c) $(filter %.c,$^) $(LDLIBS) -fPIC -shared -Wl,-soname,$@.$(soabi).$(sompatch) -o $@.$(soabi).$(sompatch)
-	ln -fs $@.$(soabi).$(sompatch) $@.$(soabi)
-	ln -fs $@.$(soabi).$(sompatch) $@
+all: $(libs) $(libsymlinks) $(pkgconfigs)
 
 %.pc: %.pc.in
 	m4 -DINCLUDEDIR="$(PREFIX)$(includedir)" -DLIBDIR="$(PREFIX)$(libdir)" $^ > $@
 
-libasound.so: private override soabi=2
-libasound.so: private override sompatch=0.0
-libasound.so: private override CPPFLAGS += -D_POSIX_SOURCE
-libasound.so: private override CFLAGS += -Wno-unused-parameter -Wno-deprecated-declarations
-libasound.so: private override LDFLAGS += -Wl,--version-script=libasound.map
-libasound.so: private override LDLIBS += -lsndio
-libasound.so: libasound.c libasound.map stubs.h symversioning-hell.h alsa.pc
+libasound.so.2.0.0: private override CPPFLAGS += -D_POSIX_SOURCE
+libasound.so.2.0.0: private override CFLAGS += -Wno-unused-parameter -Wno-deprecated-declarations
+libasound.so.2.0.0: private override LDFLAGS += -Wl,--version-script=libasound.map -Wl,-soname,libasound.so.2
+libasound.so.2.0.0: private override LDLIBS += -lsndio
+libasound.so.2.0.0: libasound.c libasound.map stubs.h symversioning-hell.h
+	$(LINK.c) -shared $(filter %.c,$^) $(LDLIBS) -o $@
 
-install-lib: $(libs) $(libsymlinks)
+libasound.so.2: libasound.so.2.0.0
+	ln -fs $^ $@
+
+libasound.so: libasound.so.2.0.0
+	ln -fs $^ $@
+
+install-lib: $(libs)
 	install -Dm755 $^ -t "$(DESTDIR)$(PREFIX)$(libdir)"
+
+install-symlinks: $(libsymlinks)
+	chmod 755 $^
+	mkdir -p "$(DESTDIR)$(PREFIX)$(libdir)"
+	cp -P $^ "$(DESTDIR)$(PREFIX)$(libdir)"
 
 install-pkgconfig: $(pkgconfigs)
 	install -Dm755 $^ -t "$(DESTDIR)$(PREFIX)$(pkgconfigdir)"
@@ -42,7 +48,7 @@ install-pkgconfig: $(pkgconfigs)
 install-include:
 	install -Dm755 -d include/alsa "$(DESTDIR)$(PREFIX)$(includedir)"
 
-install: install-lib install-pkgconfig install-include
+install: install-lib install-symlinks install-pkgconfig install-include
 
 clean:
 	$(RM) $(libs) $(libsymlinks) $(pkgconfigs)
