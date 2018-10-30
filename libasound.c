@@ -359,70 +359,84 @@ pcm_format(const snd_pcm_format_t format, struct sio_par *par)
       case SND_PCM_FORMAT_U8:
          par->bits = 8;
          par->sig = 0;
+         WARNX1("SND_PCM_FORMAT_U8");
          break;
       case SND_PCM_FORMAT_S8:
          par->bits = 8;
          par->sig = 1;
+         WARNX1("SND_PCM_FORMAT_S8");
          break;
       case SND_PCM_FORMAT_S16_LE:
          par->bits = 16;
          par->sig = 1;
          par->le = 1;
+         WARNX1("SND_PCM_FORMAT_S16_LE");
          break;
       case SND_PCM_FORMAT_S16_BE:
          par->bits = 16;
          par->sig = 1;
          par->le = 0;
+         WARNX1("SND_PCM_FORMAT_S16_BE");
          break;
       case SND_PCM_FORMAT_U16_LE:
          par->bits = 16;
          par->sig = 0;
          par->le = 1;
+         WARNX1("SND_PCM_FORMAT_U16_LE");
          break;
       case SND_PCM_FORMAT_U16_BE:
          par->bits = 16;
          par->sig = 0;
          par->le = 0;
+         WARNX1("SND_PCM_FORMAT_U16_BE");
          break;
       case SND_PCM_FORMAT_S24_LE:
          par->bits = 24;
          par->sig = 1;
          par->le = 1;
+         WARNX1("SND_PCM_FORMAT_S24_LE");
          break;
       case SND_PCM_FORMAT_S24_BE:
          par->bits = 24;
          par->sig = 1;
          par->le = 0;
+         WARNX1("SND_PCM_FORMAT_S24_BE");
          break;
       case SND_PCM_FORMAT_U24_LE:
          par->bits = 24;
          par->sig = 0;
          par->le = 1;
+         WARNX1("SND_PCM_FORMAT_U24_LE");
          break;
       case SND_PCM_FORMAT_U24_BE:
          par->bits = 24;
          par->sig = 0;
          par->le = 0;
+         WARNX1("SND_PCM_FORMAT_U24_BE");
          break;
       case SND_PCM_FORMAT_S32_LE:
          par->bits = 32;
          par->sig = 1;
          par->le = 1;
+         WARNX1("SND_PCM_FORMAT_S32_LE");
          break;
       case SND_PCM_FORMAT_S32_BE:
          par->bits = 32;
          par->sig = 1;
          par->le = 0;
+         WARNX1("SND_PCM_FORMAT_S32_BE");
          break;
       case SND_PCM_FORMAT_U32_LE:
          par->bits = 32;
          par->sig = 0;
          par->le = 1;
+         WARNX1("SND_PCM_FORMAT_U32_LE");
          break;
       case SND_PCM_FORMAT_U32_BE:
          par->bits = 32;
          par->sig = 0;
          par->le = 0;
+         WARNX1("SND_PCM_FORMAT_U32_BE");
          break;
       default:
          WARNX("unsupported format: 0x%x", format);
