@@ -7,12 +7,12 @@ filter_classifiers()
 
 ret_type_for()
 {
-   filter_classifiers <<<"$1" | sed 's/^const[\t ]*//' | grep -Eo '^(struct|unsigned)? *[a-z_]+[\t \*]*'
+   filter_classifiers <<<"$1" | sed 's/^const[\t ]*//' | grep -Eo '^(struct|unsigned)? *[a-zA-Z_]+[\t \*]*'
 }
 
 fun_name_for()
 {
-   filter_classifiers <<<"$1" | sed 's/struct//;s/const//;s/unsigned//;s/^[\t ]*//;s/[a-z_]\+[\t \*]*//' | grep -Eo '^[a-z_]+'
+   filter_classifiers <<<"$1" | sed 's/struct//;s/const//;s/unsigned//;s/^[\t ]*//;s/[a-zA-Z_]\+[\t \*]*//' | grep -Eo '^[a-zA-Z_]+'
 }
 
 should_error()
@@ -58,13 +58,14 @@ blacklist()
 return
 snd_dlsym_link
 snd_pcm_hw_strategy
+__SND_DLSYM_VERSION
 EOF
 )"
 }
 
 match()
 {
-   blacklist | grep -Eh '^(static|__inline__|const|struct|unsigned| )*[a-z_]+[\t \*]*[a-z_]+\(.*\);'
+   blacklist | grep -Eh '^(static|__inline__|const|struct|unsigned| )*[a-zA-Z_]+[\t \*]*[a-zA-Z_]+\(.*\);'
 }
 
 preprocess()

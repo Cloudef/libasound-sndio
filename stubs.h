@@ -107,7 +107,7 @@ char *snd_ctl_ascii_elem_id_get(snd_ctl_elem_id_t *id) { WARNX1("stub"); return 
 int snd_ctl_ascii_elem_id_parse(snd_ctl_elem_id_t *dst, const char *str) { WARNX1("stub"); return 0; }
 int snd_ctl_ascii_value_parse(snd_ctl_t *handle, snd_ctl_elem_value_t *dst, snd_ctl_elem_info_t *info, const char *value) { WARNX1("stub"); return 0; }
 size_t snd_ctl_elem_id_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_id_malloc(snd_ctl_elem_id_t **ptr) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_id_malloc(snd_ctl_elem_id_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_id_free(snd_ctl_elem_id_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_id_clear(snd_ctl_elem_id_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_id_copy(snd_ctl_elem_id_t *dst, const snd_ctl_elem_id_t *src) { WARNX1("stub");  }
@@ -124,7 +124,7 @@ void snd_ctl_elem_id_set_subdevice(snd_ctl_elem_id_t *obj, unsigned int val) { W
 void snd_ctl_elem_id_set_name(snd_ctl_elem_id_t *obj, const char *val) { WARNX1("stub");  }
 void snd_ctl_elem_id_set_index(snd_ctl_elem_id_t *obj, unsigned int val) { WARNX1("stub");  }
 size_t snd_ctl_card_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_ctl_card_info_malloc(snd_ctl_card_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_ctl_card_info_malloc(snd_ctl_card_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_card_info_free(snd_ctl_card_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_card_info_clear(snd_ctl_card_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_card_info_copy(snd_ctl_card_info_t *dst, const snd_ctl_card_info_t *src) { WARNX1("stub");  }
@@ -136,13 +136,13 @@ const char *snd_ctl_card_info_get_longname(const snd_ctl_card_info_t *obj) { WAR
 const char *snd_ctl_card_info_get_mixername(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_card_info_get_components(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 size_t snd_ctl_event_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_ctl_event_malloc(snd_ctl_event_t **ptr) { WARNX1("stub"); return 0; }
+int snd_ctl_event_malloc(snd_ctl_event_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_event_free(snd_ctl_event_t *obj) { WARNX1("stub");  }
 void snd_ctl_event_clear(snd_ctl_event_t *obj) { WARNX1("stub");  }
 void snd_ctl_event_copy(snd_ctl_event_t *dst, const snd_ctl_event_t *src) { WARNX1("stub");  }
 snd_ctl_event_type_t snd_ctl_event_get_type(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
 size_t snd_ctl_elem_list_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_list_malloc(snd_ctl_elem_list_t **ptr) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_list_malloc(snd_ctl_elem_list_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_list_free(snd_ctl_elem_list_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_list_clear(snd_ctl_elem_list_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_list_copy(snd_ctl_elem_list_t *dst, const snd_ctl_elem_list_t *src) { WARNX1("stub");  }
@@ -157,7 +157,7 @@ unsigned int snd_ctl_elem_list_get_subdevice(const snd_ctl_elem_list_t *obj, uns
 const char *snd_ctl_elem_list_get_name(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return NULL; }
 unsigned int snd_ctl_elem_list_get_index(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
 size_t snd_ctl_elem_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_malloc(snd_ctl_elem_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_info_malloc(snd_ctl_elem_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_info_free(snd_ctl_elem_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_info_clear(snd_ctl_elem_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_info_copy(snd_ctl_elem_info_t *dst, const snd_ctl_elem_info_t *src) { WARNX1("stub");  }
@@ -206,7 +206,7 @@ int snd_ctl_elem_add_boolean(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsign
 int snd_ctl_elem_add_enumerated(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count, unsigned int items, const char *const names[]) { WARNX1("stub"); return 0; }
 int snd_ctl_elem_remove(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return 0; }
 size_t snd_ctl_elem_value_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_value_malloc(snd_ctl_elem_value_t **ptr) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_value_malloc(snd_ctl_elem_value_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_value_free(snd_ctl_elem_value_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_value_clear(snd_ctl_elem_value_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_value_copy(snd_ctl_elem_value_t *dst, const snd_ctl_elem_value_t *src) { WARNX1("stub");  }
@@ -235,6 +235,13 @@ void snd_ctl_elem_value_set_enumerated(snd_ctl_elem_value_t *obj, unsigned int i
 void snd_ctl_elem_value_set_byte(snd_ctl_elem_value_t *obj, unsigned int idx, unsigned char val) { WARNX1("stub");  }
 void snd_ctl_elem_set_bytes(snd_ctl_elem_value_t *obj, void *data, size_t size) { WARNX1("stub");  }
 const void * snd_ctl_elem_value_get_bytes(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return NULL; }
+int snd_tlv_parse_dB_info(unsigned int *tlv, unsigned int tlv_size, unsigned int **db_tlvp) { WARNX1("stub"); return 0; }
+int snd_tlv_get_dB_range(unsigned int *tlv, long rangemin, long rangemax, long *min, long *max) { WARNX1("stub"); return 0; }
+int snd_tlv_convert_to_dB(unsigned int *tlv, long rangemin, long rangemax, long volume, long *db_gain) { WARNX1("stub"); return 0; }
+int snd_tlv_convert_from_dB(unsigned int *tlv, long rangemin, long rangemax, long db_gain, long *value, int xdir) { WARNX1("stub"); return 0; }
+int snd_ctl_get_dB_range(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long *min, long *max) { WARNX1("stub"); return 0; }
+int snd_ctl_convert_to_dB(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long volume, long *db_gain) { WARNX1("stub"); return 0; }
+int snd_ctl_convert_from_dB(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long db_gain, long *value, int xdir) { WARNX1("stub"); return 0; }
 int snd_hctl_compare_fast(const snd_hctl_elem_t *c1, const snd_hctl_elem_t *c2) { WARNX1("stub"); return 0; }
 int snd_hctl_open(snd_hctl_t **hctl, const char *name, int mode) { WARNX1("stub"); return 0; }
 int snd_hctl_open_ctl(snd_hctl_t **hctlp, snd_ctl_t *ctl) { WARNX1("stub"); return 0; }
@@ -308,7 +315,7 @@ int snd_hwdep_ioctl(snd_hwdep_t *hwdep, unsigned int request, void * arg) { WARN
 ssize_t snd_hwdep_write(snd_hwdep_t *hwdep, const void *buffer, size_t size) { WARNX1("stub"); return 0; }
 ssize_t snd_hwdep_read(snd_hwdep_t *hwdep, void *buffer, size_t size) { WARNX1("stub"); return 0; }
 size_t snd_hwdep_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_hwdep_info_malloc(snd_hwdep_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_hwdep_info_malloc(snd_hwdep_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_hwdep_info_free(snd_hwdep_info_t *obj) { WARNX1("stub");  }
 void snd_hwdep_info_copy(snd_hwdep_info_t *dst, const snd_hwdep_info_t *src) { WARNX1("stub");  }
 unsigned int snd_hwdep_info_get_device(const snd_hwdep_info_t *obj) { WARNX1("stub"); return 0; }
@@ -318,7 +325,7 @@ const char *snd_hwdep_info_get_name(const snd_hwdep_info_t *obj) { WARNX1("stub"
 snd_hwdep_iface_t snd_hwdep_info_get_iface(const snd_hwdep_info_t *obj) { WARNX1("stub"); return 0; }
 void snd_hwdep_info_set_device(snd_hwdep_info_t *obj, unsigned int val) { WARNX1("stub");  }
 size_t snd_hwdep_dsp_status_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_hwdep_dsp_status_malloc(snd_hwdep_dsp_status_t **ptr) { WARNX1("stub"); return 0; }
+int snd_hwdep_dsp_status_malloc(snd_hwdep_dsp_status_t **ptr) { WARNX1("stub"); return -1; }
 void snd_hwdep_dsp_status_free(snd_hwdep_dsp_status_t *obj) { WARNX1("stub");  }
 void snd_hwdep_dsp_status_copy(snd_hwdep_dsp_status_t *dst, const snd_hwdep_dsp_status_t *src) { WARNX1("stub");  }
 unsigned int snd_hwdep_dsp_status_get_version(const snd_hwdep_dsp_status_t *obj) { WARNX1("stub"); return 0; }
@@ -327,7 +334,7 @@ unsigned int snd_hwdep_dsp_status_get_num_dsps(const snd_hwdep_dsp_status_t *obj
 unsigned int snd_hwdep_dsp_status_get_dsp_loaded(const snd_hwdep_dsp_status_t *obj) { WARNX1("stub"); return 0; }
 unsigned int snd_hwdep_dsp_status_get_chip_ready(const snd_hwdep_dsp_status_t *obj) { WARNX1("stub"); return 0; }
 size_t snd_hwdep_dsp_image_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_hwdep_dsp_image_malloc(snd_hwdep_dsp_image_t **ptr) { WARNX1("stub"); return 0; }
+int snd_hwdep_dsp_image_malloc(snd_hwdep_dsp_image_t **ptr) { WARNX1("stub"); return -1; }
 void snd_hwdep_dsp_image_free(snd_hwdep_dsp_image_t *obj) { WARNX1("stub");  }
 void snd_hwdep_dsp_image_copy(snd_hwdep_dsp_image_t *dst, const snd_hwdep_dsp_image_t *src) { WARNX1("stub");  }
 unsigned int snd_hwdep_dsp_image_get_index(const snd_hwdep_dsp_image_t *obj) { WARNX1("stub"); return 0; }
@@ -385,7 +392,7 @@ int snd_mixer_elem_detach(snd_mixer_elem_t *melem, snd_hctl_elem_t *helem) { WAR
 int snd_mixer_elem_empty(snd_mixer_elem_t *melem) { WARNX1("stub"); return 0; }
 void *snd_mixer_elem_get_private(const snd_mixer_elem_t *melem) { WARNX1("stub"); return NULL; }
 size_t snd_mixer_class_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_mixer_class_malloc(snd_mixer_class_t **ptr) { WARNX1("stub"); return 0; }
+int snd_mixer_class_malloc(snd_mixer_class_t **ptr) { WARNX1("stub"); return -1; }
 void snd_mixer_class_free(snd_mixer_class_t *obj) { WARNX1("stub");  }
 void snd_mixer_class_copy(snd_mixer_class_t *dst, const snd_mixer_class_t *src) { WARNX1("stub");  }
 snd_mixer_t *snd_mixer_class_get_mixer(const snd_mixer_class_t *class_) { WARNX1("stub"); return NULL; }
@@ -419,21 +426,33 @@ int snd_mixer_selem_has_playback_switch_joined(snd_mixer_elem_t *elem) { WARNX1(
 int snd_mixer_selem_has_capture_switch(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_has_capture_switch_joined(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_has_capture_switch_exclusive(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_ask_playback_vol_dB(snd_mixer_elem_t *elem, long value, long *dBvalue) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_ask_capture_vol_dB(snd_mixer_elem_t *elem, long value, long *dBvalue) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_ask_playback_dB_vol(snd_mixer_elem_t *elem, long dBvalue, int dir, long *value) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_ask_capture_dB_vol(snd_mixer_elem_t *elem, long dBvalue, int dir, long *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_playback_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_get_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_get_capture_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_set_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value, int dir) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_set_capture_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value, int dir) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume_all(snd_mixer_elem_t *elem, long value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_volume_all(snd_mixer_elem_t *elem, long value) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_set_playback_dB_all(snd_mixer_elem_t *elem, long value, int dir) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_set_capture_dB_all(snd_mixer_elem_t *elem, long value, int dir) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_switch_all(snd_mixer_elem_t *elem, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_switch_all(snd_mixer_elem_t *elem, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_playback_volume_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_get_playback_dB_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume_range(snd_mixer_elem_t *elem, long min, long max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_volume_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_get_capture_dB_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_volume_range(snd_mixer_elem_t *elem, long min, long max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_is_enumerated(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_is_enum_playback(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
@@ -443,7 +462,7 @@ int snd_mixer_selem_get_enum_item_name(snd_mixer_elem_t *elem, unsigned int idx,
 int snd_mixer_selem_get_enum_item(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, unsigned int *idxp) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_enum_item(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, unsigned int idx) { WARNX1("stub"); return 0; }
 size_t snd_mixer_selem_id_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_mixer_selem_id_malloc(snd_mixer_selem_id_t **ptr) { WARNX1("stub"); return 0; }
+int snd_mixer_selem_id_malloc(snd_mixer_selem_id_t **ptr) { WARNX1("stub"); return -1; }
 void snd_mixer_selem_id_free(snd_mixer_selem_id_t *obj) { WARNX1("stub");  }
 void snd_mixer_selem_id_copy(snd_mixer_selem_id_t *dst, const snd_mixer_selem_id_t *src) { WARNX1("stub");  }
 const char *snd_mixer_selem_id_get_name(const snd_mixer_selem_id_t *obj) { WARNX1("stub"); return NULL; }
@@ -504,7 +523,7 @@ unsigned int snd_pcm_chmap_from_string(const char *str) { WARNX1("stub"); return
 snd_pcm_chmap_t *snd_pcm_chmap_parse_string(const char *str) { WARNX1("stub"); return NULL; }
 int snd_pcm_recover(snd_pcm_t *pcm, int err, int silent) { WARNX1("stub"); return 0; }
 size_t snd_pcm_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_pcm_info_malloc(snd_pcm_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_info_malloc(snd_pcm_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_info_free(snd_pcm_info_t *obj) { WARNX1("stub");  }
 void snd_pcm_info_copy(snd_pcm_info_t *dst, const snd_pcm_info_t *src) { WARNX1("stub");  }
 unsigned int snd_pcm_info_get_device(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
@@ -625,7 +644,7 @@ int snd_pcm_hw_params_set_buffer_size_minmax(snd_pcm_t *pcm, snd_pcm_hw_params_t
 int snd_pcm_hw_params_set_buffer_size_first(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_set_buffer_size_last(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_get_min_align(const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
-int snd_pcm_sw_params_malloc(snd_pcm_sw_params_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_sw_params_malloc(snd_pcm_sw_params_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_sw_params_free(snd_pcm_sw_params_t *obj) { WARNX1("stub");  }
 void snd_pcm_sw_params_copy(snd_pcm_sw_params_t *dst, const snd_pcm_sw_params_t *src) { WARNX1("stub");  }
 int snd_pcm_sw_params_get_boundary(const snd_pcm_sw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
@@ -646,7 +665,7 @@ int snd_pcm_sw_params_get_silence_threshold(const snd_pcm_sw_params_t *params, s
 int snd_pcm_sw_params_set_silence_size(snd_pcm_t *pcm, snd_pcm_sw_params_t *params, snd_pcm_uframes_t val) { WARNX1("stub"); return 0; }
 int snd_pcm_sw_params_get_silence_size(const snd_pcm_sw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
 size_t snd_pcm_access_mask_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_pcm_access_mask_malloc(snd_pcm_access_mask_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_access_mask_malloc(snd_pcm_access_mask_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_access_mask_free(snd_pcm_access_mask_t *obj) { WARNX1("stub");  }
 void snd_pcm_access_mask_copy(snd_pcm_access_mask_t *dst, const snd_pcm_access_mask_t *src) { WARNX1("stub");  }
 void snd_pcm_access_mask_none(snd_pcm_access_mask_t *mask) { WARNX1("stub");  }
@@ -655,7 +674,7 @@ int snd_pcm_access_mask_test(const snd_pcm_access_mask_t *mask, snd_pcm_access_t
 int snd_pcm_access_mask_empty(const snd_pcm_access_mask_t *mask) { WARNX1("stub"); return 0; }
 void snd_pcm_access_mask_set(snd_pcm_access_mask_t *mask, snd_pcm_access_t val) { WARNX1("stub");  }
 void snd_pcm_access_mask_reset(snd_pcm_access_mask_t *mask, snd_pcm_access_t val) { WARNX1("stub");  }
-int snd_pcm_format_mask_malloc(snd_pcm_format_mask_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_format_mask_malloc(snd_pcm_format_mask_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_format_mask_free(snd_pcm_format_mask_t *obj) { WARNX1("stub");  }
 void snd_pcm_format_mask_copy(snd_pcm_format_mask_t *dst, const snd_pcm_format_mask_t *src) { WARNX1("stub");  }
 void snd_pcm_format_mask_none(snd_pcm_format_mask_t *mask) { WARNX1("stub");  }
@@ -664,7 +683,7 @@ int snd_pcm_format_mask_empty(const snd_pcm_format_mask_t *mask) { WARNX1("stub"
 void snd_pcm_format_mask_set(snd_pcm_format_mask_t *mask, snd_pcm_format_t val) { WARNX1("stub");  }
 void snd_pcm_format_mask_reset(snd_pcm_format_mask_t *mask, snd_pcm_format_t val) { WARNX1("stub");  }
 size_t snd_pcm_subformat_mask_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_pcm_subformat_mask_malloc(snd_pcm_subformat_mask_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_subformat_mask_malloc(snd_pcm_subformat_mask_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_subformat_mask_free(snd_pcm_subformat_mask_t *obj) { WARNX1("stub");  }
 void snd_pcm_subformat_mask_copy(snd_pcm_subformat_mask_t *dst, const snd_pcm_subformat_mask_t *src) { WARNX1("stub");  }
 void snd_pcm_subformat_mask_none(snd_pcm_subformat_mask_t *mask) { WARNX1("stub");  }
@@ -674,7 +693,7 @@ int snd_pcm_subformat_mask_empty(const snd_pcm_subformat_mask_t *mask) { WARNX1(
 void snd_pcm_subformat_mask_set(snd_pcm_subformat_mask_t *mask, snd_pcm_subformat_t val) { WARNX1("stub");  }
 void snd_pcm_subformat_mask_reset(snd_pcm_subformat_mask_t *mask, snd_pcm_subformat_t val) { WARNX1("stub");  }
 size_t snd_pcm_status_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_pcm_status_malloc(snd_pcm_status_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_status_malloc(snd_pcm_status_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_status_free(snd_pcm_status_t *obj) { WARNX1("stub");  }
 void snd_pcm_status_copy(snd_pcm_status_t *dst, const snd_pcm_status_t *src) { WARNX1("stub");  }
 snd_pcm_state_t snd_pcm_status_get_state(const snd_pcm_status_t *obj) { WARNX1("stub"); return 0; }
@@ -743,7 +762,7 @@ snd_pcm_uframes_t snd_pcm_meter_get_now(snd_pcm_t *pcm) { WARNX1("stub"); return
 snd_pcm_uframes_t snd_pcm_meter_get_boundary(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_meter_add_scope(snd_pcm_t *pcm, snd_pcm_scope_t *scope) { WARNX1("stub"); return 0; }
 snd_pcm_scope_t *snd_pcm_meter_search_scope(snd_pcm_t *pcm, const char *name) { WARNX1("stub"); return NULL; }
-int snd_pcm_scope_malloc(snd_pcm_scope_t **ptr) { WARNX1("stub"); return 0; }
+int snd_pcm_scope_malloc(snd_pcm_scope_t **ptr) { WARNX1("stub"); return -1; }
 void snd_pcm_scope_set_ops(snd_pcm_scope_t *scope, const snd_pcm_scope_ops_t *val) { WARNX1("stub");  }
 void snd_pcm_scope_set_name(snd_pcm_scope_t *scope, const char *val) { WARNX1("stub");  }
 const char *snd_pcm_scope_get_name(snd_pcm_scope_t *scope) { WARNX1("stub"); return NULL; }
@@ -825,7 +844,7 @@ int snd_rawmidi_poll_descriptors(snd_rawmidi_t *rmidi, struct pollfd *pfds, unsi
 int snd_rawmidi_poll_descriptors_revents(snd_rawmidi_t *rawmidi, struct pollfd *pfds, unsigned int nfds, unsigned short *revent) { WARNX1("stub"); return 0; }
 int snd_rawmidi_nonblock(snd_rawmidi_t *rmidi, int nonblock) { WARNX1("stub"); return 0; }
 size_t snd_rawmidi_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_rawmidi_info_malloc(snd_rawmidi_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_rawmidi_info_malloc(snd_rawmidi_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_rawmidi_info_free(snd_rawmidi_info_t *obj) { WARNX1("stub");  }
 void snd_rawmidi_info_copy(snd_rawmidi_info_t *dst, const snd_rawmidi_info_t *src) { WARNX1("stub");  }
 unsigned int snd_rawmidi_info_get_device(const snd_rawmidi_info_t *obj) { WARNX1("stub"); return 0; }
@@ -843,7 +862,7 @@ void snd_rawmidi_info_set_subdevice(snd_rawmidi_info_t *obj, unsigned int val) {
 void snd_rawmidi_info_set_stream(snd_rawmidi_info_t *obj, snd_rawmidi_stream_t val) { WARNX1("stub");  }
 int snd_rawmidi_info(snd_rawmidi_t *rmidi, snd_rawmidi_info_t * info) { WARNX1("stub"); return 0; }
 size_t snd_rawmidi_params_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_rawmidi_params_malloc(snd_rawmidi_params_t **ptr) { WARNX1("stub"); return 0; }
+int snd_rawmidi_params_malloc(snd_rawmidi_params_t **ptr) { WARNX1("stub"); return -1; }
 void snd_rawmidi_params_free(snd_rawmidi_params_t *obj) { WARNX1("stub");  }
 void snd_rawmidi_params_copy(snd_rawmidi_params_t *dst, const snd_rawmidi_params_t *src) { WARNX1("stub");  }
 int snd_rawmidi_params_set_buffer_size(snd_rawmidi_t *rmidi, snd_rawmidi_params_t *params, size_t val) { WARNX1("stub"); return 0; }
@@ -855,7 +874,7 @@ int snd_rawmidi_params_get_no_active_sensing(const snd_rawmidi_params_t *params)
 int snd_rawmidi_params(snd_rawmidi_t *rmidi, snd_rawmidi_params_t * params) { WARNX1("stub"); return 0; }
 int snd_rawmidi_params_current(snd_rawmidi_t *rmidi, snd_rawmidi_params_t *params) { WARNX1("stub"); return 0; }
 size_t snd_rawmidi_status_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_rawmidi_status_malloc(snd_rawmidi_status_t **ptr) { WARNX1("stub"); return 0; }
+int snd_rawmidi_status_malloc(snd_rawmidi_status_t **ptr) { WARNX1("stub"); return -1; }
 void snd_rawmidi_status_free(snd_rawmidi_status_t *obj) { WARNX1("stub");  }
 void snd_rawmidi_status_copy(snd_rawmidi_status_t *dst, const snd_rawmidi_status_t *src) { WARNX1("stub");  }
 void snd_rawmidi_status_get_tstamp(const snd_rawmidi_status_t *obj, snd_htimestamp_t *ptr) { WARNX1("stub");  }
@@ -884,7 +903,7 @@ size_t snd_seq_get_input_buffer_size(snd_seq_t *handle) { WARNX1("stub"); return
 int snd_seq_set_output_buffer_size(snd_seq_t *handle, size_t size) { WARNX1("stub"); return 0; }
 int snd_seq_set_input_buffer_size(snd_seq_t *handle, size_t size) { WARNX1("stub"); return 0; }
 size_t snd_seq_system_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_system_info_malloc(snd_seq_system_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_system_info_malloc(snd_seq_system_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_system_info_free(snd_seq_system_info_t *ptr) { WARNX1("stub");  }
 void snd_seq_system_info_copy(snd_seq_system_info_t *dst, const snd_seq_system_info_t *src) { WARNX1("stub");  }
 int snd_seq_system_info_get_queues(const snd_seq_system_info_t *info) { WARNX1("stub"); return 0; }
@@ -895,7 +914,7 @@ int snd_seq_system_info_get_cur_clients(const snd_seq_system_info_t *info) { WAR
 int snd_seq_system_info_get_cur_queues(const snd_seq_system_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_system_info(snd_seq_t *handle, snd_seq_system_info_t *info) { WARNX1("stub"); return 0; }
 size_t snd_seq_client_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_client_info_malloc(snd_seq_client_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_client_info_malloc(snd_seq_client_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_client_info_free(snd_seq_client_info_t *ptr) { WARNX1("stub");  }
 void snd_seq_client_info_copy(snd_seq_client_info_t *dst, const snd_seq_client_info_t *src) { WARNX1("stub");  }
 int snd_seq_client_info_get_client(const snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
@@ -922,7 +941,7 @@ int snd_seq_get_any_client_info(snd_seq_t *handle, int client, snd_seq_client_in
 int snd_seq_set_client_info(snd_seq_t *handle, snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_query_next_client(snd_seq_t *handle, snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
 size_t snd_seq_client_pool_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_client_pool_malloc(snd_seq_client_pool_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_client_pool_malloc(snd_seq_client_pool_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_client_pool_free(snd_seq_client_pool_t *ptr) { WARNX1("stub");  }
 void snd_seq_client_pool_copy(snd_seq_client_pool_t *dst, const snd_seq_client_pool_t *src) { WARNX1("stub");  }
 int snd_seq_client_pool_get_client(const snd_seq_client_pool_t *info) { WARNX1("stub"); return 0; }
@@ -937,7 +956,7 @@ void snd_seq_client_pool_set_output_room(snd_seq_client_pool_t *info, size_t siz
 int snd_seq_get_client_pool(snd_seq_t *handle, snd_seq_client_pool_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_set_client_pool(snd_seq_t *handle, snd_seq_client_pool_t *info) { WARNX1("stub"); return 0; }
 size_t snd_seq_port_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_port_info_malloc(snd_seq_port_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_port_info_malloc(snd_seq_port_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_port_info_free(snd_seq_port_info_t *ptr) { WARNX1("stub");  }
 void snd_seq_port_info_copy(snd_seq_port_info_t *dst, const snd_seq_port_info_t *src) { WARNX1("stub");  }
 int snd_seq_port_info_get_client(const snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
@@ -975,7 +994,7 @@ int snd_seq_get_any_port_info(snd_seq_t *handle, int client, int port, snd_seq_p
 int snd_seq_set_port_info(snd_seq_t *handle, int port, snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_query_next_port(snd_seq_t *handle, snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
 size_t snd_seq_port_subscribe_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_port_subscribe_malloc(snd_seq_port_subscribe_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_port_subscribe_malloc(snd_seq_port_subscribe_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_port_subscribe_free(snd_seq_port_subscribe_t *ptr) { WARNX1("stub");  }
 void snd_seq_port_subscribe_copy(snd_seq_port_subscribe_t *dst, const snd_seq_port_subscribe_t *src) { WARNX1("stub");  }
 const snd_seq_addr_t *snd_seq_port_subscribe_get_sender(const snd_seq_port_subscribe_t *info) { WARNX1("stub"); return NULL; }
@@ -994,7 +1013,7 @@ int snd_seq_get_port_subscription(snd_seq_t *handle, snd_seq_port_subscribe_t *s
 int snd_seq_subscribe_port(snd_seq_t *handle, snd_seq_port_subscribe_t *sub) { WARNX1("stub"); return 0; }
 int snd_seq_unsubscribe_port(snd_seq_t *handle, snd_seq_port_subscribe_t *sub) { WARNX1("stub"); return 0; }
 size_t snd_seq_query_subscribe_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_query_subscribe_malloc(snd_seq_query_subscribe_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_query_subscribe_malloc(snd_seq_query_subscribe_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_query_subscribe_free(snd_seq_query_subscribe_t *ptr) { WARNX1("stub");  }
 void snd_seq_query_subscribe_copy(snd_seq_query_subscribe_t *dst, const snd_seq_query_subscribe_t *src) { WARNX1("stub");  }
 int snd_seq_query_subscribe_get_client(const snd_seq_query_subscribe_t *info) { WARNX1("stub"); return 0; }
@@ -1015,7 +1034,7 @@ void snd_seq_query_subscribe_set_type(snd_seq_query_subscribe_t *info, snd_seq_q
 void snd_seq_query_subscribe_set_index(snd_seq_query_subscribe_t *info, int _index) { WARNX1("stub");  }
 int snd_seq_query_port_subscribers(snd_seq_t *seq, snd_seq_query_subscribe_t * subs) { WARNX1("stub"); return 0; }
 size_t snd_seq_queue_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_queue_info_malloc(snd_seq_queue_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_queue_info_malloc(snd_seq_queue_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_queue_info_free(snd_seq_queue_info_t *ptr) { WARNX1("stub");  }
 void snd_seq_queue_info_copy(snd_seq_queue_info_t *dst, const snd_seq_queue_info_t *src) { WARNX1("stub");  }
 int snd_seq_queue_info_get_queue(const snd_seq_queue_info_t *info) { WARNX1("stub"); return 0; }
@@ -1037,7 +1056,7 @@ int snd_seq_query_named_queue(snd_seq_t *seq, const char *name) { WARNX1("stub")
 int snd_seq_get_queue_usage(snd_seq_t *handle, int q) { WARNX1("stub"); return 0; }
 int snd_seq_set_queue_usage(snd_seq_t *handle, int q, int used) { WARNX1("stub"); return 0; }
 size_t snd_seq_queue_status_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_queue_status_malloc(snd_seq_queue_status_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_queue_status_malloc(snd_seq_queue_status_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_queue_status_free(snd_seq_queue_status_t *ptr) { WARNX1("stub");  }
 void snd_seq_queue_status_copy(snd_seq_queue_status_t *dst, const snd_seq_queue_status_t *src) { WARNX1("stub");  }
 int snd_seq_queue_status_get_queue(const snd_seq_queue_status_t *info) { WARNX1("stub"); return 0; }
@@ -1047,7 +1066,7 @@ const snd_seq_real_time_t *snd_seq_queue_status_get_real_time(const snd_seq_queu
 unsigned int snd_seq_queue_status_get_status(const snd_seq_queue_status_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_get_queue_status(snd_seq_t *handle, int q, snd_seq_queue_status_t *status) { WARNX1("stub"); return 0; }
 size_t snd_seq_queue_tempo_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_queue_tempo_malloc(snd_seq_queue_tempo_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_queue_tempo_malloc(snd_seq_queue_tempo_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_queue_tempo_free(snd_seq_queue_tempo_t *ptr) { WARNX1("stub");  }
 void snd_seq_queue_tempo_copy(snd_seq_queue_tempo_t *dst, const snd_seq_queue_tempo_t *src) { WARNX1("stub");  }
 int snd_seq_queue_tempo_get_queue(const snd_seq_queue_tempo_t *info) { WARNX1("stub"); return 0; }
@@ -1062,7 +1081,7 @@ void snd_seq_queue_tempo_set_skew_base(snd_seq_queue_tempo_t *info, unsigned int
 int snd_seq_get_queue_tempo(snd_seq_t *handle, int q, snd_seq_queue_tempo_t *tempo) { WARNX1("stub"); return 0; }
 int snd_seq_set_queue_tempo(snd_seq_t *handle, int q, snd_seq_queue_tempo_t *tempo) { WARNX1("stub"); return 0; }
 size_t snd_seq_queue_timer_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_queue_timer_malloc(snd_seq_queue_timer_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_queue_timer_malloc(snd_seq_queue_timer_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_queue_timer_free(snd_seq_queue_timer_t *ptr) { WARNX1("stub");  }
 void snd_seq_queue_timer_copy(snd_seq_queue_timer_t *dst, const snd_seq_queue_timer_t *src) { WARNX1("stub");  }
 int snd_seq_queue_timer_get_queue(const snd_seq_queue_timer_t *info) { WARNX1("stub"); return 0; }
@@ -1089,7 +1108,7 @@ int snd_seq_drop_output_buffer(snd_seq_t *handle) { WARNX1("stub"); return 0; }
 int snd_seq_drop_input(snd_seq_t *handle) { WARNX1("stub"); return 0; }
 int snd_seq_drop_input_buffer(snd_seq_t *handle) { WARNX1("stub"); return 0; }
 size_t snd_seq_remove_events_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_seq_remove_events_malloc(snd_seq_remove_events_t **ptr) { WARNX1("stub"); return 0; }
+int snd_seq_remove_events_malloc(snd_seq_remove_events_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_remove_events_free(snd_seq_remove_events_t *ptr) { WARNX1("stub");  }
 void snd_seq_remove_events_copy(snd_seq_remove_events_t *dst, const snd_seq_remove_events_t *src) { WARNX1("stub");  }
 unsigned int snd_seq_remove_events_get_condition(const snd_seq_remove_events_t *info) { WARNX1("stub"); return 0; }
@@ -1160,7 +1179,7 @@ int snd_timer_stop(snd_timer_t *handle) { WARNX1("stub"); return 0; }
 int snd_timer_continue(snd_timer_t *handle) { WARNX1("stub"); return 0; }
 ssize_t snd_timer_read(snd_timer_t *handle, void *buffer, size_t size) { WARNX1("stub"); return 0; }
 size_t snd_timer_id_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_timer_id_malloc(snd_timer_id_t **ptr) { WARNX1("stub"); return 0; }
+int snd_timer_id_malloc(snd_timer_id_t **ptr) { WARNX1("stub"); return -1; }
 void snd_timer_id_free(snd_timer_id_t *obj) { WARNX1("stub");  }
 void snd_timer_id_copy(snd_timer_id_t *dst, const snd_timer_id_t *src) { WARNX1("stub");  }
 void snd_timer_id_set_class(snd_timer_id_t *id, int dev_class) { WARNX1("stub");  }
@@ -1174,7 +1193,7 @@ int snd_timer_id_get_device(snd_timer_id_t *id) { WARNX1("stub"); return 0; }
 void snd_timer_id_set_subdevice(snd_timer_id_t *id, int subdevice) { WARNX1("stub");  }
 int snd_timer_id_get_subdevice(snd_timer_id_t *id) { WARNX1("stub"); return 0; }
 size_t snd_timer_ginfo_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_timer_ginfo_malloc(snd_timer_ginfo_t **ptr) { WARNX1("stub"); return 0; }
+int snd_timer_ginfo_malloc(snd_timer_ginfo_t **ptr) { WARNX1("stub"); return -1; }
 void snd_timer_ginfo_free(snd_timer_ginfo_t *obj) { WARNX1("stub");  }
 void snd_timer_ginfo_copy(snd_timer_ginfo_t *dst, const snd_timer_ginfo_t *src) { WARNX1("stub");  }
 int snd_timer_ginfo_set_tid(snd_timer_ginfo_t *obj, snd_timer_id_t *tid) { WARNX1("stub"); return 0; }
@@ -1188,7 +1207,7 @@ unsigned long snd_timer_ginfo_get_resolution_min(snd_timer_ginfo_t *obj) { WARNX
 unsigned long snd_timer_ginfo_get_resolution_max(snd_timer_ginfo_t *obj) { WARNX1("stub"); return 0; }
 unsigned int snd_timer_ginfo_get_clients(snd_timer_ginfo_t *obj) { WARNX1("stub"); return 0; }
 size_t snd_timer_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_timer_info_malloc(snd_timer_info_t **ptr) { WARNX1("stub"); return 0; }
+int snd_timer_info_malloc(snd_timer_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_timer_info_free(snd_timer_info_t *obj) { WARNX1("stub");  }
 void snd_timer_info_copy(snd_timer_info_t *dst, const snd_timer_info_t *src) { WARNX1("stub");  }
 int snd_timer_info_is_slave(snd_timer_info_t * info) { WARNX1("stub"); return 0; }
@@ -1197,7 +1216,7 @@ const char *snd_timer_info_get_id(snd_timer_info_t * info) { WARNX1("stub"); ret
 const char *snd_timer_info_get_name(snd_timer_info_t * info) { WARNX1("stub"); return NULL; }
 long snd_timer_info_get_resolution(snd_timer_info_t * info) { WARNX1("stub"); return 0; }
 size_t snd_timer_params_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_timer_params_malloc(snd_timer_params_t **ptr) { WARNX1("stub"); return 0; }
+int snd_timer_params_malloc(snd_timer_params_t **ptr) { WARNX1("stub"); return -1; }
 void snd_timer_params_free(snd_timer_params_t *obj) { WARNX1("stub");  }
 void snd_timer_params_copy(snd_timer_params_t *dst, const snd_timer_params_t *src) { WARNX1("stub");  }
 int snd_timer_params_set_auto_start(snd_timer_params_t * params, int auto_start) { WARNX1("stub"); return 0; }
@@ -1213,7 +1232,7 @@ long snd_timer_params_get_queue_size(snd_timer_params_t * params) { WARNX1("stub
 void snd_timer_params_set_filter(snd_timer_params_t * params, unsigned int filter) { WARNX1("stub");  }
 unsigned int snd_timer_params_get_filter(snd_timer_params_t * params) { WARNX1("stub"); return 0; }
 size_t snd_timer_status_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_timer_status_malloc(snd_timer_status_t **ptr) { WARNX1("stub"); return 0; }
+int snd_timer_status_malloc(snd_timer_status_t **ptr) { WARNX1("stub"); return -1; }
 void snd_timer_status_free(snd_timer_status_t *obj) { WARNX1("stub");  }
 void snd_timer_status_copy(snd_timer_status_t *dst, const snd_timer_status_t *src) { WARNX1("stub");  }
 snd_htimestamp_t snd_timer_status_get_timestamp(snd_timer_status_t * status) { WARNX1("stub"); return (snd_htimestamp_t){0}; }
