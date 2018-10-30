@@ -14,11 +14,11 @@
 #include <err.h>
 
 #define WARN1(x) do { warn("asound: %s %s", __func__, x); } while (0)
-#define WARN(x, ...) do { warn("asound: %s "x, __func__, ##__VA_ARGS__); } while (0)
+#define WARN(x, ...) do { warn("asound: %s " x, __func__, ##__VA_ARGS__); } while (0)
 #define WARNX1(x) do { warnx("asound: %s %s", __func__, x); } while (0)
-#define WARNX(x, ...) do { warnx("asound: %s "x, __func__, ##__VA_ARGS__); } while (0)
-#define ERRX(x, y, ...) do { errx(x, "asound: %s "y, __func__, ##__VA_ARGS__); } while (0)
-#define ERR(x, y, ...) do { err(x, "asound: %s "y, __func__, ##__VA_ARGS__); } while (0)
+#define WARNX(x, ...) do { warnx("asound: %s " x, __func__, ##__VA_ARGS__); } while (0)
+#define ERRX(x, y, ...) do { errx(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
+#define ERR(x, y, ...) do { err(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
 
 #include "stubs.h"
 
