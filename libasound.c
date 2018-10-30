@@ -12,11 +12,13 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <err.h>
+#include <poll.h>
 
 #define WARN1(x) do { warn("asound: %s %s", __func__, x); } while (0)
 #define WARN(x, ...) do { warn("asound: %s " x, __func__, ##__VA_ARGS__); } while (0)
 #define WARNX1(x) do { warnx("asound: %s %s", __func__, x); } while (0)
 #define WARNX(x, ...) do { warnx("asound: %s " x, __func__, ##__VA_ARGS__); } while (0)
+#define ERRX1(x, y) do { errx(x, "asound: %s %s", __func__, y); } while (0)
 #define ERRX(x, y, ...) do { errx(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
 #define ERR(x, y, ...) do { err(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
 
@@ -138,6 +140,7 @@ struct _snd_pcm {
    struct _snd_pcm_sw_params sw;
    struct sio_hdl *hdl;
    const char *name;
+   snd_pcm_uframes_t position, written;
    snd_pcm_stream_t stream;
    bool started;
 };
@@ -156,14 +159,18 @@ static int
 sndio_mode(int mode)
 {
    switch (mode) {
-      // There are programs such as wine who don't actually implement proper polling, but just write the
-      // frames directly to alsa from audio thread. This model won't work with sndio so lets just force
-      // blocking operation for everything.
-      case SND_PCM_NONBLOCK: WARNX1("SND_PCM_NONBLOCK requested, but we force blocking mode!"); return false;
+      case SND_PCM_NONBLOCK: WARNX1("SND_PCM_NONBLOCK"); return true;
       // ASYNC: SIGIO will be emitted whenever a period has been completely processed by the soundcard.
-      case SND_PCM_ASYNC: errx(EXIT_FAILURE, "asound: SND_PCM_ASYNC is not supported");
+      case SND_PCM_ASYNC: ERRX1(EXIT_FAILURE, "SND_PCM_ASYNC is not supported");
    }
    return false;
+}
+
+static void
+onmove(void *arg, int delta)
+{
+   snd_pcm_t *pcm = arg;
+   pcm->position += delta;
 }
 
 static struct sio_hdl*
@@ -178,6 +185,7 @@ device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
       return NULL;
    }
 
+   sio_onmove(hdl, onmove, pcm);
    return hdl;
 }
 
@@ -215,7 +223,6 @@ snd_pcm_name(snd_pcm_t *pcm)
 int
 snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
 {
-#if 0
    WARNX("snd_pcm_nonblock(%d)", nonblock);
 
    snd_pcm_drain(pcm);
@@ -225,12 +232,6 @@ snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
       return -1;
 
    return snd_pcm_hw_params(pcm, &pcm->hw_requested);
-#else
-   if (nonblock)
-      WARNX1("SND_PCM_NONBLOCK requested, but we force blocking mode!");
-
-   return 0;
-#endif
 }
 
 snd_pcm_state_t
@@ -245,7 +246,9 @@ snd_pcm_state(snd_pcm_t *pcm)
 snd_pcm_sframes_t
 snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 {
-   return snd_pcm_bytes_to_frames(pcm, sio_write(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, size)));
+   const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, sio_write(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, size)));
+   pcm->written += ret;
+   return ret;
 }
 
 snd_pcm_sframes_t
@@ -257,23 +260,61 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 snd_pcm_sframes_t
 snd_pcm_avail_update(snd_pcm_t *pcm)
 {
-   // FIXME: not correct, but fine since we force blocking for now
-   return snd_pcm_bytes_to_frames(pcm, pcm->hw.par.bufsz);
+   struct pollfd pfd[16];
+   int nfds = sio_nfds(pcm->hdl);
+   assert((unsigned int)nfds < ARRAY_SIZE(pfd));
+
+   // FIXME: should POLLIN / POLLOUT depending on stream
+   if (!sio_pollfd(pcm->hdl, pfd, POLLOUT)) {
+      WARNX1("sio_pollfd failed");
+      goto fail;
+   }
+
+   errno = 0;
+   while ((nfds = poll(pfd, nfds, 0)) < 0) {
+      if (errno == EINVAL) {
+         WARNX1("poll EINVAL");
+         goto fail;
+      }
+   }
+
+   int events = 0;
+   for (int i = 0; i < nfds; ++i)
+      events |= sio_revents(pcm->hdl, pfd);
+
+   // FIXME: should POLLIN / POLLOUT depending on stream
+   if (!(events & POLLOUT))
+      goto fail;
+
+   return pcm->hw.par.appbufsz;
+
+fail:
+   // NOTE: returning 1, as some programs don't check the return value :/ (namely qwebengine)
+   //       thus they SIGFPE by dividing by 0 or -1
+   return 1;
+}
+
+snd_pcm_sframes_t
+snd_pcm_avail(snd_pcm_t *pcm)
+{
+   return snd_pcm_avail_update(pcm);
 }
 
 int
 snd_pcm_delay(snd_pcm_t *pcm, snd_pcm_sframes_t *delayp)
 {
    // FIXME: not correct, but fine since we force blocking for now
-   if (delayp) *delayp = 0;
+   if (delayp) *delayp = pcm->written - pcm->position;
    return 0;
 }
 
 int
 snd_pcm_prepare(snd_pcm_t *pcm)
 {
-   if (!pcm->started && sio_start(pcm->hdl))
+   if (!pcm->started && sio_start(pcm->hdl)) {
       pcm->started = true;
+      pcm->written = pcm->position = 0;
+   }
 
    return (pcm->started ? 0 : -1);
 }
@@ -287,8 +328,10 @@ snd_pcm_start(snd_pcm_t *pcm)
 int
 snd_pcm_drain(snd_pcm_t *pcm)
 {
-   if (pcm->started && sio_stop(pcm->hdl))
+   if (pcm->started && sio_stop(pcm->hdl)) {
       pcm->started = false;
+      pcm->written = pcm->position = 0;
+   }
 
    return (!pcm->started ? 0 : -1);
 }

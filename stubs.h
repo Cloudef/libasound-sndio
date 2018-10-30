@@ -499,7 +499,6 @@ int snd_pcm_reset(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_status(snd_pcm_t *pcm, snd_pcm_status_t *status) { WARNX1("stub"); return 0; }
 int snd_pcm_hwsync(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_htimestamp(snd_pcm_t *pcm, snd_pcm_uframes_t *avail, snd_htimestamp_t *tstamp) { WARNX1("stub"); return 0; }
-snd_pcm_sframes_t snd_pcm_avail(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_avail_delay(snd_pcm_t *pcm, snd_pcm_sframes_t *availp, snd_pcm_sframes_t *delayp) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_rewindable(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_rewind(snd_pcm_t *pcm, snd_pcm_uframes_t frames) { WARNX1("stub"); return 0; }
