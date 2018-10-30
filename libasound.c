@@ -127,7 +127,7 @@ sndio_mode(int mode)
 }
 
 static struct sio_hdl*
-device_open(const char *name, snd_pcm_stream_t stream, int mode)
+device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
 {
    const char *sndio_name = (!name || !strcmp(name, "default") ? SIO_DEVANY : name);
 
@@ -151,7 +151,7 @@ snd_pcm_open(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t stream, int mod
       return -1;
    }
 
-   if (!((*pcm)->hdl = device_open(name, stream, mode)))
+   if (!((*pcm)->hdl = device_open(*pcm, name, stream, mode)))
       return -1;
 
    (*pcm)->name = name;
