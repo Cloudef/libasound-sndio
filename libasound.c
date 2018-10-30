@@ -303,7 +303,6 @@ snd_pcm_avail(snd_pcm_t *pcm)
 int
 snd_pcm_delay(snd_pcm_t *pcm, snd_pcm_sframes_t *delayp)
 {
-   // FIXME: not correct, but fine since we force blocking for now
    if (delayp) *delayp = pcm->written - pcm->position;
    return 0;
 }
