@@ -119,7 +119,10 @@ static int
 sndio_mode(int mode)
 {
    switch (mode) {
-      case SND_PCM_NONBLOCK: return true;
+      // There are programs such as wine who don't actually implement proper polling, but just write the
+      // frames directly to alsa from audio thread. This model won't work with sndio so lets just force
+      // blocking operation for everything.
+      case SND_PCM_NONBLOCK: WARNX1("SND_PCM_NONBLOCK requested, but we force blocking mode!"); return false;
       // ASYNC: SIGIO will be emitted whenever a period has been completely processed by the soundcard.
       case SND_PCM_ASYNC: errx(EXIT_FAILURE, "asound: SND_PCM_ASYNC is not supported");
    }
@@ -169,14 +172,22 @@ snd_pcm_close(snd_pcm_t *pcm)
 int
 snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
 {
+#if 0
+   WARNX("snd_pcm_nonblock(%d)", nonblock);
+
    snd_pcm_drain(pcm);
    sio_close(pcm->hdl);
 
-   if (!(pcm->hdl = device_open(pcm->name, pcm->stream, (nonblock ? SND_PCM_NONBLOCK : false))))
+   if (!(pcm->hdl = device_open(pcm, pcm->name, pcm->stream, (nonblock ? SND_PCM_NONBLOCK : false))))
       return -1;
 
    return snd_pcm_hw_params(pcm, &pcm->hw_requested);
+#else
+   if (nonblock)
+      WARNX1("SND_PCM_NONBLOCK requested, but we force blocking mode!");
 
+   return 0;
+#endif
 }
 
 snd_pcm_sframes_t
