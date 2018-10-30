@@ -46,7 +46,7 @@ install-pkgconfig: $(pkgconfigs)
 	install -Dm755 $^ -t "$(DESTDIR)$(PREFIX)$(pkgconfigdir)"
 
 install-include:
-	install -Dm755 -d include/alsa "$(DESTDIR)$(PREFIX)$(includedir)"
+	cp -r include "$(DESTDIR)$(PREFIX)$(includedir)"
 
 install: install-lib install-symlinks install-pkgconfig install-include
 
