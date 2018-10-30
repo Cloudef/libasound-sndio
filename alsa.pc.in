@@ -1,0 +1,9 @@
+libdir=LIBDIR/lib
+includedir=INCLUDEDIR/include
+
+Name: alsa
+Description: Advanced Linux Sound Architecture (ALSA) - Library
+Version: 1.1.7
+Requires:
+Libs: -L${libdir} -lasound
+Cflags: -I${includedir}
