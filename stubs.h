@@ -55,141 +55,141 @@ int snd_config_get_ctl_iface_ascii(const char *ascii) { WARNX1("stub"); return -
 int snd_config_get_ctl_iface(const snd_config_t *conf) { WARNX1("stub"); return -1; }
 int snd_names_list(const char *iface, snd_devname_t **list) { WARNX1("stub"); return 0; }
 void snd_names_list_free(snd_devname_t *list) { WARNX1("stub");  }
-int snd_ctl_open(snd_ctl_t **ctl, const char *name, int mode) { WARNX1("stub"); return 0; }
-int snd_ctl_open_lconf(snd_ctl_t **ctl, const char *name, int mode, snd_config_t *lconf) { WARNX1("stub"); return 0; }
-int snd_ctl_open_fallback(snd_ctl_t **ctl, snd_config_t *root, const char *name, const char *orig_name, int mode) { WARNX1("stub"); return 0; }
-int snd_ctl_close(snd_ctl_t *ctl) { WARNX1("stub"); return 0; }
-int snd_ctl_nonblock(snd_ctl_t *ctl, int nonblock) { WARNX1("stub"); return 0; }
+int snd_ctl_open(snd_ctl_t **ctl, const char *name, int mode) { WARNX1("stub"); return -1; }
+int snd_ctl_open_lconf(snd_ctl_t **ctl, const char *name, int mode, snd_config_t *lconf) { WARNX1("stub"); return -1; }
+int snd_ctl_open_fallback(snd_ctl_t **ctl, snd_config_t *root, const char *name, const char *orig_name, int mode) { WARNX1("stub"); return -1; }
+int snd_ctl_close(snd_ctl_t *ctl) { WARNX1("stub"); return -1; }
+int snd_ctl_nonblock(snd_ctl_t *ctl, int nonblock) { WARNX1("stub"); return -1; }
 int snd_async_add_ctl_handler(snd_async_handler_t **handler, snd_ctl_t *ctl, snd_async_callback_t callback, void *private_data) { WARNX1("stub"); return 0; }
 snd_ctl_t *snd_async_handler_get_ctl(snd_async_handler_t *handler) { WARNX1("stub"); return NULL; }
-int snd_ctl_poll_descriptors_count(snd_ctl_t *ctl) { WARNX1("stub"); return 0; }
-int snd_ctl_poll_descriptors(snd_ctl_t *ctl, struct pollfd *pfds, unsigned int space) { WARNX1("stub"); return 0; }
-int snd_ctl_poll_descriptors_revents(snd_ctl_t *ctl, struct pollfd *pfds, unsigned int nfds, unsigned short *revents) { WARNX1("stub"); return 0; }
-int snd_ctl_subscribe_events(snd_ctl_t *ctl, int subscribe) { WARNX1("stub"); return 0; }
-int snd_ctl_card_info(snd_ctl_t *ctl, snd_ctl_card_info_t *info) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_list(snd_ctl_t *ctl, snd_ctl_elem_list_t *list) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info(snd_ctl_t *ctl, snd_ctl_elem_info_t *info) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_read(snd_ctl_t *ctl, snd_ctl_elem_value_t *data) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_write(snd_ctl_t *ctl, snd_ctl_elem_value_t *data) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_lock(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_unlock(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_tlv_read(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int *tlv, unsigned int tlv_size) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_tlv_write(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, const unsigned int *tlv) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_tlv_command(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, const unsigned int *tlv) { WARNX1("stub"); return 0; }
-int snd_ctl_hwdep_next_device(snd_ctl_t *ctl, int * device) { WARNX1("stub"); return 0; }
-int snd_ctl_hwdep_info(snd_ctl_t *ctl, snd_hwdep_info_t * info) { WARNX1("stub"); return 0; }
-int snd_ctl_pcm_next_device(snd_ctl_t *ctl, int *device) { WARNX1("stub"); return 0; }
-int snd_ctl_pcm_info(snd_ctl_t *ctl, snd_pcm_info_t * info) { WARNX1("stub"); return 0; }
-int snd_ctl_pcm_prefer_subdevice(snd_ctl_t *ctl, int subdev) { WARNX1("stub"); return 0; }
-int snd_ctl_rawmidi_next_device(snd_ctl_t *ctl, int * device) { WARNX1("stub"); return 0; }
-int snd_ctl_rawmidi_info(snd_ctl_t *ctl, snd_rawmidi_info_t * info) { WARNX1("stub"); return 0; }
-int snd_ctl_rawmidi_prefer_subdevice(snd_ctl_t *ctl, int subdev) { WARNX1("stub"); return 0; }
-int snd_ctl_set_power_state(snd_ctl_t *ctl, unsigned int state) { WARNX1("stub"); return 0; }
-int snd_ctl_get_power_state(snd_ctl_t *ctl, unsigned int *state) { WARNX1("stub"); return 0; }
-int snd_ctl_read(snd_ctl_t *ctl, snd_ctl_event_t *event) { WARNX1("stub"); return 0; }
-int snd_ctl_wait(snd_ctl_t *ctl, int timeout) { WARNX1("stub"); return 0; }
+int snd_ctl_poll_descriptors_count(snd_ctl_t *ctl) { WARNX1("stub"); return -1; }
+int snd_ctl_poll_descriptors(snd_ctl_t *ctl, struct pollfd *pfds, unsigned int space) { WARNX1("stub"); return -1; }
+int snd_ctl_poll_descriptors_revents(snd_ctl_t *ctl, struct pollfd *pfds, unsigned int nfds, unsigned short *revents) { WARNX1("stub"); return -1; }
+int snd_ctl_subscribe_events(snd_ctl_t *ctl, int subscribe) { WARNX1("stub"); return -1; }
+int snd_ctl_card_info(snd_ctl_t *ctl, snd_ctl_card_info_t *info) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_list(snd_ctl_t *ctl, snd_ctl_elem_list_t *list) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info(snd_ctl_t *ctl, snd_ctl_elem_info_t *info) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_read(snd_ctl_t *ctl, snd_ctl_elem_value_t *data) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_write(snd_ctl_t *ctl, snd_ctl_elem_value_t *data) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_lock(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_unlock(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_tlv_read(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int *tlv, unsigned int tlv_size) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_tlv_write(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, const unsigned int *tlv) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_tlv_command(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, const unsigned int *tlv) { WARNX1("stub"); return -1; }
+int snd_ctl_hwdep_next_device(snd_ctl_t *ctl, int * device) { WARNX1("stub"); return -1; }
+int snd_ctl_hwdep_info(snd_ctl_t *ctl, snd_hwdep_info_t * info) { WARNX1("stub"); return -1; }
+int snd_ctl_pcm_next_device(snd_ctl_t *ctl, int *device) { WARNX1("stub"); return -1; }
+int snd_ctl_pcm_info(snd_ctl_t *ctl, snd_pcm_info_t * info) { WARNX1("stub"); return -1; }
+int snd_ctl_pcm_prefer_subdevice(snd_ctl_t *ctl, int subdev) { WARNX1("stub"); return -1; }
+int snd_ctl_rawmidi_next_device(snd_ctl_t *ctl, int * device) { WARNX1("stub"); return -1; }
+int snd_ctl_rawmidi_info(snd_ctl_t *ctl, snd_rawmidi_info_t * info) { WARNX1("stub"); return -1; }
+int snd_ctl_rawmidi_prefer_subdevice(snd_ctl_t *ctl, int subdev) { WARNX1("stub"); return -1; }
+int snd_ctl_set_power_state(snd_ctl_t *ctl, unsigned int state) { WARNX1("stub"); return -1; }
+int snd_ctl_get_power_state(snd_ctl_t *ctl, unsigned int *state) { WARNX1("stub"); return -1; }
+int snd_ctl_read(snd_ctl_t *ctl, snd_ctl_event_t *event) { WARNX1("stub"); return -1; }
+int snd_ctl_wait(snd_ctl_t *ctl, int timeout) { WARNX1("stub"); return -1; }
 const char *snd_ctl_name(snd_ctl_t *ctl) { WARNX1("stub"); return NULL; }
-snd_ctl_type_t snd_ctl_type(snd_ctl_t *ctl) { WARNX1("stub"); return 0; }
+snd_ctl_type_t snd_ctl_type(snd_ctl_t *ctl) { WARNX1("stub"); return -1; }
 const char *snd_ctl_elem_type_name(snd_ctl_elem_type_t type) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_elem_iface_name(snd_ctl_elem_iface_t iface) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_event_type_name(snd_ctl_event_type_t type) { WARNX1("stub"); return NULL; }
-unsigned int snd_ctl_event_elem_get_mask(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_event_elem_get_numid(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_event_elem_get_mask(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_event_elem_get_numid(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
 void snd_ctl_event_elem_get_id(const snd_ctl_event_t *obj, snd_ctl_elem_id_t *ptr) { WARNX1("stub");  }
-snd_ctl_elem_iface_t snd_ctl_event_elem_get_interface(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_event_elem_get_device(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_event_elem_get_subdevice(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
+snd_ctl_elem_iface_t snd_ctl_event_elem_get_interface(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_event_elem_get_device(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_event_elem_get_subdevice(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
 const char *snd_ctl_event_elem_get_name(const snd_ctl_event_t *obj) { WARNX1("stub"); return NULL; }
-unsigned int snd_ctl_event_elem_get_index(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_list_alloc_space(snd_ctl_elem_list_t *obj, unsigned int entries) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_event_elem_get_index(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_list_alloc_space(snd_ctl_elem_list_t *obj, unsigned int entries) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_list_free_space(snd_ctl_elem_list_t *obj) { WARNX1("stub");  }
 char *snd_ctl_ascii_elem_id_get(snd_ctl_elem_id_t *id) { WARNX1("stub"); return NULL; }
-int snd_ctl_ascii_elem_id_parse(snd_ctl_elem_id_t *dst, const char *str) { WARNX1("stub"); return 0; }
-int snd_ctl_ascii_value_parse(snd_ctl_t *handle, snd_ctl_elem_value_t *dst, snd_ctl_elem_info_t *info, const char *value) { WARNX1("stub"); return 0; }
-size_t snd_ctl_elem_id_sizeof(void) { WARNX1("stub"); return 0; }
+int snd_ctl_ascii_elem_id_parse(snd_ctl_elem_id_t *dst, const char *str) { WARNX1("stub"); return -1; }
+int snd_ctl_ascii_value_parse(snd_ctl_t *handle, snd_ctl_elem_value_t *dst, snd_ctl_elem_info_t *info, const char *value) { WARNX1("stub"); return -1; }
+size_t snd_ctl_elem_id_sizeof(void) { WARNX1("stub"); return -1; }
 int snd_ctl_elem_id_malloc(snd_ctl_elem_id_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_id_free(snd_ctl_elem_id_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_id_clear(snd_ctl_elem_id_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_id_copy(snd_ctl_elem_id_t *dst, const snd_ctl_elem_id_t *src) { WARNX1("stub");  }
-unsigned int snd_ctl_elem_id_get_numid(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return 0; }
-snd_ctl_elem_iface_t snd_ctl_elem_id_get_interface(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_id_get_device(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_id_get_subdevice(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_id_get_numid(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return -1; }
+snd_ctl_elem_iface_t snd_ctl_elem_id_get_interface(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_id_get_device(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_id_get_subdevice(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return -1; }
 const char *snd_ctl_elem_id_get_name(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return NULL; }
-unsigned int snd_ctl_elem_id_get_index(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_id_get_index(const snd_ctl_elem_id_t *obj) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_id_set_numid(snd_ctl_elem_id_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_id_set_interface(snd_ctl_elem_id_t *obj, snd_ctl_elem_iface_t val) { WARNX1("stub");  }
 void snd_ctl_elem_id_set_device(snd_ctl_elem_id_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_id_set_subdevice(snd_ctl_elem_id_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_id_set_name(snd_ctl_elem_id_t *obj, const char *val) { WARNX1("stub");  }
 void snd_ctl_elem_id_set_index(snd_ctl_elem_id_t *obj, unsigned int val) { WARNX1("stub");  }
-size_t snd_ctl_card_info_sizeof(void) { WARNX1("stub"); return 0; }
+size_t snd_ctl_card_info_sizeof(void) { WARNX1("stub"); return -1; }
 int snd_ctl_card_info_malloc(snd_ctl_card_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_card_info_free(snd_ctl_card_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_card_info_clear(snd_ctl_card_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_card_info_copy(snd_ctl_card_info_t *dst, const snd_ctl_card_info_t *src) { WARNX1("stub");  }
-int snd_ctl_card_info_get_card(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return 0; }
+int snd_ctl_card_info_get_card(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return -1; }
 const char *snd_ctl_card_info_get_id(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_card_info_get_driver(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_card_info_get_name(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_card_info_get_longname(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_card_info_get_mixername(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_ctl_card_info_get_components(const snd_ctl_card_info_t *obj) { WARNX1("stub"); return NULL; }
-size_t snd_ctl_event_sizeof(void) { WARNX1("stub"); return 0; }
+size_t snd_ctl_event_sizeof(void) { WARNX1("stub"); return -1; }
 int snd_ctl_event_malloc(snd_ctl_event_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_event_free(snd_ctl_event_t *obj) { WARNX1("stub");  }
 void snd_ctl_event_clear(snd_ctl_event_t *obj) { WARNX1("stub");  }
 void snd_ctl_event_copy(snd_ctl_event_t *dst, const snd_ctl_event_t *src) { WARNX1("stub");  }
-snd_ctl_event_type_t snd_ctl_event_get_type(const snd_ctl_event_t *obj) { WARNX1("stub"); return 0; }
-size_t snd_ctl_elem_list_sizeof(void) { WARNX1("stub"); return 0; }
+snd_ctl_event_type_t snd_ctl_event_get_type(const snd_ctl_event_t *obj) { WARNX1("stub"); return -1; }
+size_t snd_ctl_elem_list_sizeof(void) { WARNX1("stub"); return -1; }
 int snd_ctl_elem_list_malloc(snd_ctl_elem_list_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_list_free(snd_ctl_elem_list_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_list_clear(snd_ctl_elem_list_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_list_copy(snd_ctl_elem_list_t *dst, const snd_ctl_elem_list_t *src) { WARNX1("stub");  }
 void snd_ctl_elem_list_set_offset(snd_ctl_elem_list_t *obj, unsigned int val) { WARNX1("stub");  }
-unsigned int snd_ctl_elem_list_get_used(const snd_ctl_elem_list_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_list_get_count(const snd_ctl_elem_list_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_list_get_used(const snd_ctl_elem_list_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_list_get_count(const snd_ctl_elem_list_t *obj) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_list_get_id(const snd_ctl_elem_list_t *obj, unsigned int idx, snd_ctl_elem_id_t *ptr) { WARNX1("stub");  }
-unsigned int snd_ctl_elem_list_get_numid(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-snd_ctl_elem_iface_t snd_ctl_elem_list_get_interface(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_list_get_device(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_list_get_subdevice(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_list_get_numid(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+snd_ctl_elem_iface_t snd_ctl_elem_list_get_interface(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_list_get_device(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_list_get_subdevice(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
 const char *snd_ctl_elem_list_get_name(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return NULL; }
-unsigned int snd_ctl_elem_list_get_index(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-size_t snd_ctl_elem_info_sizeof(void) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_list_get_index(const snd_ctl_elem_list_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+size_t snd_ctl_elem_info_sizeof(void) { WARNX1("stub"); return -1; }
 int snd_ctl_elem_info_malloc(snd_ctl_elem_info_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_info_free(snd_ctl_elem_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_info_clear(snd_ctl_elem_info_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_info_copy(snd_ctl_elem_info_t *dst, const snd_ctl_elem_info_t *src) { WARNX1("stub");  }
-snd_ctl_elem_type_t snd_ctl_elem_info_get_type(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_readable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_writable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_volatile(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_inactive(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_locked(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_tlv_readable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_tlv_writable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_tlv_commandable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_owner(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_is_user(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-pid_t snd_ctl_elem_info_get_owner(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_info_get_count(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-long snd_ctl_elem_info_get_min(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-long snd_ctl_elem_info_get_max(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-long snd_ctl_elem_info_get_step(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_info_get_items(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
+snd_ctl_elem_type_t snd_ctl_elem_info_get_type(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_readable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_writable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_volatile(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_inactive(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_locked(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_tlv_readable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_tlv_writable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_tlv_commandable(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_owner(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_is_user(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+pid_t snd_ctl_elem_info_get_owner(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_info_get_count(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+long snd_ctl_elem_info_get_min(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+long snd_ctl_elem_info_get_max(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+long snd_ctl_elem_info_get_step(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_info_get_items(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_info_set_item(snd_ctl_elem_info_t *obj, unsigned int val) { WARNX1("stub");  }
 const char *snd_ctl_elem_info_get_item_name(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return NULL; }
-int snd_ctl_elem_info_get_dimensions(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_get_dimension(const snd_ctl_elem_info_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_info_set_dimension(snd_ctl_elem_info_t *info, const int dimension[4]) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_info_get_dimensions(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_get_dimension(const snd_ctl_elem_info_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_info_set_dimension(snd_ctl_elem_info_t *info, const int dimension[4]) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_info_get_id(const snd_ctl_elem_info_t *obj, snd_ctl_elem_id_t *ptr) { WARNX1("stub");  }
-unsigned int snd_ctl_elem_info_get_numid(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-snd_ctl_elem_iface_t snd_ctl_elem_info_get_interface(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_info_get_device(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_info_get_subdevice(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_info_get_numid(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+snd_ctl_elem_iface_t snd_ctl_elem_info_get_interface(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_info_get_device(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_info_get_subdevice(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
 const char *snd_ctl_elem_info_get_name(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return NULL; }
-unsigned int snd_ctl_elem_info_get_index(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_info_get_index(const snd_ctl_elem_info_t *obj) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_info_set_id(snd_ctl_elem_info_t *obj, const snd_ctl_elem_id_t *ptr) { WARNX1("stub");  }
 void snd_ctl_elem_info_set_numid(snd_ctl_elem_info_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_info_set_interface(snd_ctl_elem_info_t *obj, snd_ctl_elem_iface_t val) { WARNX1("stub");  }
@@ -197,27 +197,27 @@ void snd_ctl_elem_info_set_device(snd_ctl_elem_info_t *obj, unsigned int val) { 
 void snd_ctl_elem_info_set_subdevice(snd_ctl_elem_info_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_info_set_name(snd_ctl_elem_info_t *obj, const char *val) { WARNX1("stub");  }
 void snd_ctl_elem_info_set_index(snd_ctl_elem_info_t *obj, unsigned int val) { WARNX1("stub");  }
-int snd_ctl_add_integer_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count, long min, long max, long step) { WARNX1("stub"); return 0; }
-int snd_ctl_add_boolean_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count) { WARNX1("stub"); return 0; }
-int snd_ctl_add_enumerated_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count, unsigned int items, const char *const labels[]) { WARNX1("stub"); return 0; }
-int snd_ctl_add_bytes_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_add_integer(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count, long imin, long imax, long istep) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_add_boolean(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_add_enumerated(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count, unsigned int items, const char *const names[]) { WARNX1("stub"); return 0; }
-int snd_ctl_elem_remove(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return 0; }
-size_t snd_ctl_elem_value_sizeof(void) { WARNX1("stub"); return 0; }
+int snd_ctl_add_integer_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count, long min, long max, long step) { WARNX1("stub"); return -1; }
+int snd_ctl_add_boolean_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count) { WARNX1("stub"); return -1; }
+int snd_ctl_add_enumerated_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count, unsigned int items, const char *const labels[]) { WARNX1("stub"); return -1; }
+int snd_ctl_add_bytes_elem_set(snd_ctl_t *ctl, snd_ctl_elem_info_t *info, unsigned int element_count, unsigned int member_count) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_add_integer(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count, long imin, long imax, long istep) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_add_boolean(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_add_enumerated(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, unsigned int count, unsigned int items, const char *const names[]) { WARNX1("stub"); return -1; }
+int snd_ctl_elem_remove(snd_ctl_t *ctl, snd_ctl_elem_id_t *id) { WARNX1("stub"); return -1; }
+size_t snd_ctl_elem_value_sizeof(void) { WARNX1("stub"); return -1; }
 int snd_ctl_elem_value_malloc(snd_ctl_elem_value_t **ptr) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_value_free(snd_ctl_elem_value_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_value_clear(snd_ctl_elem_value_t *obj) { WARNX1("stub");  }
 void snd_ctl_elem_value_copy(snd_ctl_elem_value_t *dst, const snd_ctl_elem_value_t *src) { WARNX1("stub");  }
-int snd_ctl_elem_value_compare(snd_ctl_elem_value_t *left, const snd_ctl_elem_value_t *right) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_value_compare(snd_ctl_elem_value_t *left, const snd_ctl_elem_value_t *right) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_value_get_id(const snd_ctl_elem_value_t *obj, snd_ctl_elem_id_t *ptr) { WARNX1("stub");  }
-unsigned int snd_ctl_elem_value_get_numid(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return 0; }
-snd_ctl_elem_iface_t snd_ctl_elem_value_get_interface(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_value_get_device(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_value_get_subdevice(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_value_get_numid(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return -1; }
+snd_ctl_elem_iface_t snd_ctl_elem_value_get_interface(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_value_get_device(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_value_get_subdevice(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return -1; }
 const char *snd_ctl_elem_value_get_name(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return NULL; }
-unsigned int snd_ctl_elem_value_get_index(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return 0; }
+unsigned int snd_ctl_elem_value_get_index(const snd_ctl_elem_value_t *obj) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_value_set_id(snd_ctl_elem_value_t *obj, const snd_ctl_elem_id_t *ptr) { WARNX1("stub");  }
 void snd_ctl_elem_value_set_numid(snd_ctl_elem_value_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_value_set_interface(snd_ctl_elem_value_t *obj, snd_ctl_elem_iface_t val) { WARNX1("stub");  }
@@ -225,10 +225,10 @@ void snd_ctl_elem_value_set_device(snd_ctl_elem_value_t *obj, unsigned int val) 
 void snd_ctl_elem_value_set_subdevice(snd_ctl_elem_value_t *obj, unsigned int val) { WARNX1("stub");  }
 void snd_ctl_elem_value_set_name(snd_ctl_elem_value_t *obj, const char *val) { WARNX1("stub");  }
 void snd_ctl_elem_value_set_index(snd_ctl_elem_value_t *obj, unsigned int val) { WARNX1("stub");  }
-int snd_ctl_elem_value_get_boolean(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-long snd_ctl_elem_value_get_integer(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-unsigned int snd_ctl_elem_value_get_enumerated(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
-unsigned char snd_ctl_elem_value_get_byte(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return 0; }
+int snd_ctl_elem_value_get_boolean(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+long snd_ctl_elem_value_get_integer(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+unsigned int snd_ctl_elem_value_get_enumerated(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
+unsigned char snd_ctl_elem_value_get_byte(const snd_ctl_elem_value_t *obj, unsigned int idx) { WARNX1("stub"); return -1; }
 void snd_ctl_elem_value_set_boolean(snd_ctl_elem_value_t *obj, unsigned int idx, long val) { WARNX1("stub");  }
 void snd_ctl_elem_value_set_integer(snd_ctl_elem_value_t *obj, unsigned int idx, long val) { WARNX1("stub");  }
 void snd_ctl_elem_value_set_enumerated(snd_ctl_elem_value_t *obj, unsigned int idx, unsigned int val) { WARNX1("stub");  }
@@ -239,9 +239,9 @@ int snd_tlv_parse_dB_info(unsigned int *tlv, unsigned int tlv_size, unsigned int
 int snd_tlv_get_dB_range(unsigned int *tlv, long rangemin, long rangemax, long *min, long *max) { WARNX1("stub"); return 0; }
 int snd_tlv_convert_to_dB(unsigned int *tlv, long rangemin, long rangemax, long volume, long *db_gain) { WARNX1("stub"); return 0; }
 int snd_tlv_convert_from_dB(unsigned int *tlv, long rangemin, long rangemax, long db_gain, long *value, int xdir) { WARNX1("stub"); return 0; }
-int snd_ctl_get_dB_range(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long *min, long *max) { WARNX1("stub"); return 0; }
-int snd_ctl_convert_to_dB(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long volume, long *db_gain) { WARNX1("stub"); return 0; }
-int snd_ctl_convert_from_dB(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long db_gain, long *value, int xdir) { WARNX1("stub"); return 0; }
+int snd_ctl_get_dB_range(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long *min, long *max) { WARNX1("stub"); return -1; }
+int snd_ctl_convert_to_dB(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long volume, long *db_gain) { WARNX1("stub"); return -1; }
+int snd_ctl_convert_from_dB(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, long db_gain, long *value, int xdir) { WARNX1("stub"); return -1; }
 int snd_hctl_compare_fast(const snd_hctl_elem_t *c1, const snd_hctl_elem_t *c2) { WARNX1("stub"); return 0; }
 int snd_hctl_open(snd_hctl_t **hctl, const char *name, int mode) { WARNX1("stub"); return 0; }
 int snd_hctl_open_ctl(snd_hctl_t **hctlp, snd_ctl_t *ctl) { WARNX1("stub"); return 0; }
@@ -287,8 +287,8 @@ int snd_sctl_build(snd_sctl_t **ctl, snd_ctl_t *handle, snd_config_t *config, sn
 int snd_sctl_free(snd_sctl_t *handle) { WARNX1("stub"); return 0; }
 int snd_sctl_install(snd_sctl_t *handle) { WARNX1("stub"); return 0; }
 int snd_sctl_remove(snd_sctl_t *handle) { WARNX1("stub"); return 0; }
-int snd_ctl_ext_create(snd_ctl_ext_t *ext, const char *name, int mode) { WARNX1("stub"); return 0; }
-int snd_ctl_ext_delete(snd_ctl_ext_t *ext) { WARNX1("stub"); return 0; }
+int snd_ctl_ext_create(snd_ctl_ext_t *ext, const char *name, int mode) { WARNX1("stub"); return -1; }
+int snd_ctl_ext_delete(snd_ctl_ext_t *ext) { WARNX1("stub"); return -1; }
 snd_local_error_handler_t snd_lib_error_set_local(snd_local_error_handler_t func) { WARNX1("stub"); return 0; }
 void *snd_dlopen(const char *file, int mode, char *errbuf, size_t errbuflen) { WARNX1("stub"); return NULL; }
 void *snd_dlsym(void *handle, const char *name, const char *version) { WARNX1("stub"); return NULL; }
