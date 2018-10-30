@@ -24,8 +24,8 @@
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
-const
-char *snd_asoundlib_version(void)
+const char*
+snd_asoundlib_version(void)
 {
    return "1.1.7";
 }
