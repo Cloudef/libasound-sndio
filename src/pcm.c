@@ -273,7 +273,7 @@ snd_pcm_avail_update(snd_pcm_t *pcm)
    if (!(revents & POLLOUT) && !(revents & POLLIN))
       goto nodata;
 
-   return pcm->avail;
+   return (pcm->avail > pcm->hw.par.appbufsz ? pcm->hw.par.appbufsz : pcm->avail);
 
 nodata:
    // NOTE: returning 1, as some programs don't check the return value :/ (namely qwebengine)
@@ -284,7 +284,7 @@ nodata:
 snd_pcm_sframes_t
 snd_pcm_avail(snd_pcm_t *pcm)
 {
-   return pcm->avail;
+   return (pcm->avail > pcm->hw.par.appbufsz ? pcm->hw.par.appbufsz : pcm->avail);
 }
 
 int
