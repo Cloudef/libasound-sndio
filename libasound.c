@@ -147,7 +147,7 @@ struct _snd_pcm {
    struct _snd_pcm_sw_params sw;
    struct sio_hdl *hdl;
    const char *name;
-   snd_pcm_uframes_t position, written;
+   snd_pcm_uframes_t position, written, avail;
    snd_pcm_stream_t stream;
    int mode;
    bool started;
@@ -179,6 +179,7 @@ onmove(void *arg, int delta)
 {
    snd_pcm_t *pcm = arg;
    pcm->position += delta;
+   pcm->avail += delta;
 }
 
 static struct sio_hdl*
@@ -342,6 +343,7 @@ snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 {
    const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, (void*)buffer, size, (size_t(*)(struct sio_hdl*, void*, size_t))sio_write));
    pcm->written += ret;
+   pcm->avail -= ret;
    return ret;
 }
 
@@ -350,6 +352,7 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 {
    const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, buffer, size, sio_read));
    pcm->written += ret;
+   pcm->avail -= ret;
    return ret;
 }
 
@@ -362,22 +365,22 @@ snd_pcm_avail_update(snd_pcm_t *pcm)
 
    nfds = sio_pollfd(pcm->hdl, pfd, (pcm->stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
 
-   // FIXME: timeout should be period time
+   // XXX: timeout should be period time/buffer time(?)
    errno = 0;
    while ((nfds = poll(pfd, nfds, -1)) < 0) {
       if (errno == EINVAL) {
          WARNX1("poll EINVAL");
-         goto fail;
+         goto nodata;
       }
    }
 
-   const int events = sio_revents(pcm->hdl, pfd);
-   if (!(events & (POLLOUT | POLLIN)))
-      goto fail;
+   const int revents = sio_revents(pcm->hdl, pfd);
+   if (!(revents & POLLOUT) && !(revents & POLLIN))
+      goto nodata;
 
-   return pcm->hw.par.appbufsz;
+   return pcm->avail;
 
-fail:
+nodata:
    // NOTE: returning 1, as some programs don't check the return value :/ (namely qwebengine)
    //       thus they SIGFPE by dividing by 0 or -1
    return 1;
@@ -386,7 +389,7 @@ fail:
 snd_pcm_sframes_t
 snd_pcm_avail(snd_pcm_t *pcm)
 {
-   return snd_pcm_avail_update(pcm);
+   return pcm->avail;
 }
 
 int
@@ -402,6 +405,7 @@ snd_pcm_prepare(snd_pcm_t *pcm)
    if (!pcm->started && sio_start(pcm->hdl)) {
       pcm->started = true;
       pcm->written = pcm->position = 0;
+      pcm->avail = pcm->hw.par.bufsz;
    }
 
    return (pcm->started ? 0 : -1);
