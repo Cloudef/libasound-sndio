@@ -634,8 +634,6 @@ int snd_pcm_hw_params_set_buffer_size_minmax(snd_pcm_t *pcm, snd_pcm_hw_params_t
 int snd_pcm_hw_params_set_buffer_size_first(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_set_buffer_size_last(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_get_min_align(const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
-int snd_pcm_sw_params_malloc(snd_pcm_sw_params_t **ptr) { WARNX1("stub"); return -1; }
-void snd_pcm_sw_params_free(snd_pcm_sw_params_t *obj) { WARNX1("stub");  }
 void snd_pcm_sw_params_copy(snd_pcm_sw_params_t *dst, const snd_pcm_sw_params_t *src) { WARNX1("stub");  }
 int snd_pcm_sw_params_get_boundary(const snd_pcm_sw_params_t *params, snd_pcm_uframes_t *val) { WARNX1("stub"); return 0; }
 int snd_pcm_sw_params_set_tstamp_mode(snd_pcm_t *pcm, snd_pcm_sw_params_t *params, snd_pcm_tstamp_t val) { WARNX1("stub"); return 0; }

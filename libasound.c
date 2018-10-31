@@ -978,6 +978,20 @@ snd_pcm_sw_params_sizeof(void)
 }
 
 int
+snd_pcm_sw_params_malloc(snd_pcm_sw_params_t **ptr)
+{
+   // OpenAL-soft uses this :(
+   *ptr = calloc(1, sizeof(**ptr));
+   return (*ptr ? 0 : -1);
+}
+
+void
+snd_pcm_sw_params_free(snd_pcm_sw_params_t *ptr)
+{
+   free(ptr);
+}
+
+int
 snd_pcm_sw_params_current(snd_pcm_t *pcm, snd_pcm_sw_params_t *params)
 {
    *params = pcm->sw;
