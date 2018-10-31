@@ -7,12 +7,12 @@ filter_classifiers()
 
 ret_type_for()
 {
-   filter_classifiers <<<"$1" | sed 's/^const[\t ]*//' | grep -Eo '^(struct|unsigned)? *[a-zA-Z_]+[\t \*]*'
+   filter_classifiers <<<"$1" | sed 's/^const[\t ]*//' | grep -Eo '^(struct|unsigned)? *[a-zA-Z0-9_]+[\t \*]*'
 }
 
 fun_name_for()
 {
-   filter_classifiers <<<"$1" | sed 's/struct//;s/const//;s/unsigned//;s/^[\t ]*//;s/[a-zA-Z_]\+[\t \*]*//' | grep -Eo '^[a-zA-Z_]+'
+   filter_classifiers <<<"$1" | sed 's/struct//;s/const//;s/unsigned//;s/^[\t ]*//;s/[a-zA-Z0-9_]\+[\t \*]*//' | grep -Eo '^[a-zA-Z0-9_]+'
 }
 
 should_error()
@@ -38,7 +38,9 @@ return_for()
       snd_pcm_sync_id_t|snd_htimestamp_t)
          printf 'return (%s){0};' "$ret"
          ;;
-      'unsigned char'|int|'unsigned int'|long|'unsigned long'|size_t|ssize_t|pid_t|snd_*)
+      uint8_t|uint16_t|uint32_t|uint64_t|\
+      'unsigned char'|int|'unsigned int'|long|'unsigned long'|\
+      size_t|ssize_t|pid_t|snd_*)
          if should_error "$2"; then
             printf 'return -1;'
          else
@@ -65,7 +67,7 @@ EOF
 
 match()
 {
-   blacklist | grep -Eh '^(static|__inline__|const|struct|unsigned| )*[a-zA-Z_]+[\t \*]*[a-zA-Z_]+\(.*\);'
+   blacklist | grep -Eh '^(static|__inline__|const|struct|unsigned| )*[a-zA-Z0-9_]+[\t \*]*[a-zA-Z0-9_]+\(.*\);'
 }
 
 preprocess()
