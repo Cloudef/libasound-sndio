@@ -79,8 +79,6 @@ int snd_ctl_elem_tlv_write(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, const un
 int snd_ctl_elem_tlv_command(snd_ctl_t *ctl, const snd_ctl_elem_id_t *id, const unsigned int *tlv) { WARNX1("stub"); return 0; }
 int snd_ctl_hwdep_next_device(snd_ctl_t *ctl, int * device) { WARNX1("stub"); return 0; }
 int snd_ctl_hwdep_info(snd_ctl_t *ctl, snd_hwdep_info_t * info) { WARNX1("stub"); return 0; }
-int snd_ctl_pcm_next_device(snd_ctl_t *ctl, int *device) { WARNX1("stub"); return 0; }
-int snd_ctl_pcm_info(snd_ctl_t *ctl, snd_pcm_info_t * info) { WARNX1("stub"); return 0; }
 int snd_ctl_pcm_prefer_subdevice(snd_ctl_t *ctl, int subdev) { WARNX1("stub"); return 0; }
 int snd_ctl_rawmidi_next_device(snd_ctl_t *ctl, int * device) { WARNX1("stub"); return 0; }
 int snd_ctl_rawmidi_info(snd_ctl_t *ctl, snd_rawmidi_info_t * info) { WARNX1("stub"); return 0; }
@@ -491,16 +489,12 @@ int snd_pcm_chmap_print(const snd_pcm_chmap_t *map, size_t maxlen, char *buf) { 
 unsigned int snd_pcm_chmap_from_string(const char *str) { WARNX1("stub"); return 0; }
 snd_pcm_chmap_t *snd_pcm_chmap_parse_string(const char *str) { WARNX1("stub"); return NULL; }
 int snd_pcm_recover(snd_pcm_t *pcm, int err, int silent) { WARNX1("stub"); return 0; }
-size_t snd_pcm_info_sizeof(void) { WARNX1("stub"); return 0; }
-int snd_pcm_info_malloc(snd_pcm_info_t **ptr) { WARNX1("stub"); return -1; }
-void snd_pcm_info_free(snd_pcm_info_t *obj) { WARNX1("stub");  }
 void snd_pcm_info_copy(snd_pcm_info_t *dst, const snd_pcm_info_t *src) { WARNX1("stub");  }
 unsigned int snd_pcm_info_get_device(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
 unsigned int snd_pcm_info_get_subdevice(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
 snd_pcm_stream_t snd_pcm_info_get_stream(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
 int snd_pcm_info_get_card(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
 const char *snd_pcm_info_get_id(const snd_pcm_info_t *obj) { WARNX1("stub"); return NULL; }
-const char *snd_pcm_info_get_name(const snd_pcm_info_t *obj) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_info_get_subdevice_name(const snd_pcm_info_t *obj) { WARNX1("stub"); return NULL; }
 snd_pcm_class_t snd_pcm_info_get_class(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
 snd_pcm_subclass_t snd_pcm_info_get_subclass(const snd_pcm_info_t *obj) { WARNX1("stub"); return 0; }
@@ -907,7 +901,6 @@ int snd_seq_client_info_event_filter_check(snd_seq_client_info_t *info, int even
 int snd_seq_get_client_info(snd_seq_t *handle, snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_get_any_client_info(snd_seq_t *handle, int client, snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_set_client_info(snd_seq_t *handle, snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
-int snd_seq_query_next_client(snd_seq_t *handle, snd_seq_client_info_t *info) { WARNX1("stub"); return 0; }
 size_t snd_seq_client_pool_sizeof(void) { WARNX1("stub"); return 0; }
 int snd_seq_client_pool_malloc(snd_seq_client_pool_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_client_pool_free(snd_seq_client_pool_t *ptr) { WARNX1("stub");  }
@@ -960,7 +953,6 @@ int snd_seq_delete_port(snd_seq_t *handle, int port) { WARNX1("stub"); return 0;
 int snd_seq_get_port_info(snd_seq_t *handle, int port, snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_get_any_port_info(snd_seq_t *handle, int client, int port, snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
 int snd_seq_set_port_info(snd_seq_t *handle, int port, snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
-int snd_seq_query_next_port(snd_seq_t *handle, snd_seq_port_info_t *info) { WARNX1("stub"); return 0; }
 size_t snd_seq_port_subscribe_sizeof(void) { WARNX1("stub"); return 0; }
 int snd_seq_port_subscribe_malloc(snd_seq_port_subscribe_t **ptr) { WARNX1("stub"); return -1; }
 void snd_seq_port_subscribe_free(snd_seq_port_subscribe_t *ptr) { WARNX1("stub");  }

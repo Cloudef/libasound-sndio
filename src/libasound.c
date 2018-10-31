@@ -106,6 +106,57 @@ snd_device_name_free_hint(void **hints)
    return 0;
 }
 
+struct _snd_pcm_info {
+   const char *name;
+};
+
+size_t
+snd_pcm_info_sizeof(void)
+{
+   return sizeof(snd_pcm_info_t);
+}
+
+int
+snd_pcm_info_malloc(snd_pcm_info_t **ptr)
+{
+   if (!(*ptr = calloc(1, sizeof(**ptr)))) {
+      WARNX1("calloc failed");
+      return -1;
+   }
+
+   return 0;
+}
+
+void
+snd_pcm_info_free(snd_pcm_info_t *obj)
+{
+   free(obj);
+}
+
+const char*
+snd_pcm_info_get_name(const snd_pcm_info_t *obj)
+{
+   return obj->name;
+}
+
+int
+snd_ctl_pcm_info(snd_ctl_t *ctl, snd_pcm_info_t *info)
+{
+   info->name = "sndio";
+   return 0;
+}
+
+int
+snd_ctl_pcm_next_device(snd_ctl_t *ctl, int *device)
+{
+   if (device) {
+      *device = (*device == -1 ? 0 : -1);
+      return 0;
+   }
+
+   return -1;
+}
+
 struct _snd_ctl {
    char noop;
 };
@@ -170,4 +221,16 @@ const char*
 snd_ctl_card_info_get_mixername(const snd_ctl_card_info_t *obj)
 {
    return obj->name;
+}
+
+int
+snd_seq_query_next_port(snd_seq_t *handle, snd_seq_port_info_t *info)
+{
+   return -1;
+}
+
+int
+snd_seq_query_next_client(snd_seq_t *handle, snd_seq_client_info_t *info)
+{
+   return -1;
 }
