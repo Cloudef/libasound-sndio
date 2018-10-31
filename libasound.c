@@ -677,7 +677,7 @@ snd_pcm_hw_params_get_format_mask(snd_pcm_hw_params_t *params, snd_pcm_format_ma
          SND_PCM_FORMAT_FLOAT_BE
    };
    static snd_pcm_format_mask_t def_mask = { .fmts = def_fmts, .nmemb = ARRAY_SIZE(def_fmts) };
-   *mask = def_mask;
+   if (mask) *mask = def_mask;
 }
 
 int
