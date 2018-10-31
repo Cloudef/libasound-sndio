@@ -149,6 +149,7 @@ struct _snd_pcm {
    const char *name;
    snd_pcm_uframes_t position, written;
    snd_pcm_stream_t stream;
+   int mode;
    bool started;
 };
 
@@ -193,6 +194,7 @@ device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
    }
 
    sio_onmove(hdl, onmove, pcm);
+   pcm->mode = mode;
    return hdl;
 }
 
@@ -231,8 +233,10 @@ snd_pcm_name(snd_pcm_t *pcm)
 int
 snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
 {
-   WARNX("snd_pcm_nonblock(%d)", nonblock);
+   if ((pcm->mode == SND_PCM_NONBLOCK && nonblock) || (!pcm->mode && !nonblock))
+      return 0;
 
+   WARNX("snd_pcm_nonblock(%d)", nonblock);
    snd_pcm_drain(pcm);
    sio_close(pcm->hdl);
 
