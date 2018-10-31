@@ -14,6 +14,8 @@
 #include <err.h>
 #include <poll.h>
 
+#include "dsp/dsp.h"
+
 #define WARN1(x) do { warn("asound: %s %s", __func__, x); } while (0)
 #define WARN(x, ...) do { warn("asound: %s " x, __func__, ##__VA_ARGS__); } while (0)
 #define WARNX1(x) do { warnx("asound: %s %s", __func__, x); } while (0)
@@ -131,11 +133,16 @@ snd_device_name_free_hint(void **hints)
    return 0;
 }
 
-struct _snd_pcm_hw_params { struct sio_par par; struct sio_cap cap; };
+struct _snd_pcm_hw_params {
+   struct sio_cap cap;
+   struct sio_par par;
+   snd_pcm_format_t alsa_format;
+   bool needs_conversion; // for unsupported formats
+};
+
 struct _snd_pcm_sw_params { char noop; };
 
 struct _snd_pcm {
-   struct sio_cap cap;
    struct _snd_pcm_hw_params hw, hw_requested;
    struct _snd_pcm_sw_params sw;
    struct sio_hdl *hdl;
@@ -202,8 +209,9 @@ snd_pcm_open(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t stream, int mod
    if (!((*pcm)->hdl = device_open(*pcm, name, stream, mode)))
       return -1;
 
+   sio_initpar(&(*pcm)->hw_requested.par);
    (*pcm)->name = (name ? name : "default");
-   return (sio_getcap((*pcm)->hdl, &(*pcm)->cap) && sio_getpar((*pcm)->hdl, &(*pcm)->hw.par) ? 0 : -1);
+   return (sio_getcap((*pcm)->hdl, &(*pcm)->hw.cap) && sio_getpar((*pcm)->hdl, &(*pcm)->hw.par) ? 0 : -1);
 }
 
 int
@@ -243,10 +251,67 @@ snd_pcm_state(snd_pcm_t *pcm)
    return SND_PCM_STATE_OPEN;
 }
 
+static size_t
+io_do(snd_pcm_t *pcm, void *buffer, const size_t frames, size_t (*io)(struct sio_hdl*, void*, size_t))
+{
+   if (pcm->hw.needs_conversion) {
+      struct aparams params = {
+         .bps = pcm->hw.par.bps,
+         .bits = pcm->hw.par.bits,
+         .le = pcm->hw.par.le,
+         .sig = pcm->hw.par.sig,
+         .msb = pcm->hw.par.msb
+      };
+
+      struct conv dec, enc;
+      dec_init(&dec, &params, pcm->hw.par.pchan);
+      enc_init(&enc, &params, pcm->hw.par.pchan);
+
+      size_t total_frames = frames, io_bytes = 0;
+      unsigned char decoded[4096], encoded[sizeof(decoded)];
+      const size_t max_frames = snd_pcm_bytes_to_frames(pcm, sizeof(decoded));
+      for (unsigned char *p = buffer; total_frames > 0;) {
+         const int todo_frames = (total_frames > max_frames ? max_frames : total_frames);
+         total_frames -= todo_frames;
+
+         // sadly can't function pointer here as some formats may need different parameters for decoder
+         if (pcm->hw.alsa_format == SND_PCM_FORMAT_FLOAT_LE || pcm->hw.alsa_format == SND_PCM_FORMAT_FLOAT_BE) {
+            dec_do_float(&dec, p, decoded, todo_frames);
+         } else {
+            dec_do(&dec, p, decoded, todo_frames);
+         }
+
+         enc_do(&enc, decoded, encoded, todo_frames);
+
+         const size_t todo_bytes = snd_pcm_frames_to_bytes(pcm, todo_frames);
+         io_bytes += io(pcm->hdl, encoded, todo_bytes);
+         p += todo_bytes;
+      }
+
+      return io_bytes;
+   }
+
+   return io(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, frames));
+}
+
+snd_pcm_sframes_t
+snd_pcm_bytes_to_frames(snd_pcm_t *pcm, ssize_t bytes)
+{
+   const int bpf = (pcm->hw.par.bits * pcm->hw.par.pchan) / 8;
+   return bytes / bpf;
+}
+
+ssize_t
+snd_pcm_frames_to_bytes(snd_pcm_t *pcm, snd_pcm_sframes_t frames)
+{
+   const int bpf = (pcm->hw.par.bits * pcm->hw.par.pchan) / 8;
+   return frames * bpf;
+}
+
 snd_pcm_sframes_t
 snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 {
-   const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, sio_write(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, size)));
+   const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, (void*)buffer, size, (size_t(*)(struct sio_hdl*, void*, size_t))sio_write));
    pcm->written += ret;
    return ret;
 }
@@ -254,7 +319,9 @@ snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 snd_pcm_sframes_t
 snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 {
-   return snd_pcm_bytes_to_frames(pcm, sio_read(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, size)));
+   const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, buffer, size, sio_read));
+   pcm->written += ret;
+   return ret;
 }
 
 snd_pcm_sframes_t
@@ -356,20 +423,6 @@ snd_pcm_pause(snd_pcm_t *pcm, int enable)
    return (enable ? snd_pcm_drain(pcm) : snd_pcm_start(pcm));
 }
 
-snd_pcm_sframes_t
-snd_pcm_bytes_to_frames(snd_pcm_t *pcm, ssize_t bytes)
-{
-   const int bpf = (pcm->hw.par.bits * pcm->hw.par.pchan) / 8;
-   return bytes / bpf;
-}
-
-ssize_t
-snd_pcm_frames_to_bytes(snd_pcm_t *pcm, snd_pcm_sframes_t frames)
-{
-   const int bpf = (pcm->hw.par.bits * pcm->hw.par.pchan) / 8;
-   return frames * bpf;
-}
-
 size_t
 snd_pcm_hw_params_sizeof(void)
 {
@@ -396,7 +449,7 @@ copy_important_params(struct sio_par *dst, const struct sio_par *src)
 int
 snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 {
-   params->cap = pcm->cap;
+   params->cap = pcm->hw.cap;
    sio_initpar(&params->par);
    copy_important_params(&params->par, &pcm->hw.par);
    WARNX("rate: %u, round: %u, appbufsz: %u pchan: %u", params->par.rate, params->par.round, params->par.appbufsz, params->par.pchan);
@@ -406,16 +459,16 @@ snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 int
 snd_pcm_hw_params(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 {
-   pcm->hw_requested = *params;
-
-   if (memcmp(&params->par, &pcm->hw.par, sizeof(params->par))) {
+   if (memcmp(params, &pcm->hw, sizeof(*params))) {
       snd_pcm_drain(pcm);
 
-      if (!sio_setpar(pcm->hdl, &pcm->hw_requested.par)) {
+      pcm->hw_requested = *params;
+      if (!sio_setpar(pcm->hdl, &params->par)) {
          WARNX1("sio_setpar failed");
          return -1;
       }
 
+      pcm->hw = *params;
       if (!sio_getpar(pcm->hdl, &pcm->hw.par)) {
          WARNX1("sio_getpar failed");
          return -1;
@@ -465,6 +518,8 @@ snd_pcm_format_name(const snd_pcm_format_t format)
       NAME(SND_PCM_FORMAT_S32_BE);
       NAME(SND_PCM_FORMAT_U32_LE);
       NAME(SND_PCM_FORMAT_U32_BE);
+      NAME(SND_PCM_FORMAT_FLOAT_LE);
+      NAME(SND_PCM_FORMAT_FLOAT_BE);
       default:
          WARNX("unsupported format: 0x%x", format);
          return "unsupported";
@@ -473,90 +528,82 @@ snd_pcm_format_name(const snd_pcm_format_t format)
 }
 
 static bool
-pcm_format(const snd_pcm_format_t format, struct sio_par *par)
+pcm_format(const snd_pcm_format_t format, struct sio_par *par, bool *out_needs_conversion)
 {
    switch (format) {
       case SND_PCM_FORMAT_U8:
          par->bits = 8;
          par->sig = 0;
-         WARNX1("SND_PCM_FORMAT_U8");
          break;
       case SND_PCM_FORMAT_S8:
          par->bits = 8;
          par->sig = 1;
-         WARNX1("SND_PCM_FORMAT_S8");
          break;
       case SND_PCM_FORMAT_S16_LE:
          par->bits = 16;
          par->sig = 1;
          par->le = 1;
-         WARNX1("SND_PCM_FORMAT_S16_LE");
          break;
       case SND_PCM_FORMAT_S16_BE:
          par->bits = 16;
          par->sig = 1;
          par->le = 0;
-         WARNX1("SND_PCM_FORMAT_S16_BE");
          break;
       case SND_PCM_FORMAT_U16_LE:
          par->bits = 16;
          par->sig = 0;
          par->le = 1;
-         WARNX1("SND_PCM_FORMAT_U16_LE");
          break;
       case SND_PCM_FORMAT_U16_BE:
          par->bits = 16;
          par->sig = 0;
          par->le = 0;
-         WARNX1("SND_PCM_FORMAT_U16_BE");
          break;
       case SND_PCM_FORMAT_S24_LE:
          par->bits = 24;
          par->sig = 1;
          par->le = 1;
-         WARNX1("SND_PCM_FORMAT_S24_LE");
          break;
       case SND_PCM_FORMAT_S24_BE:
          par->bits = 24;
          par->sig = 1;
          par->le = 0;
-         WARNX1("SND_PCM_FORMAT_S24_BE");
          break;
       case SND_PCM_FORMAT_U24_LE:
          par->bits = 24;
          par->sig = 0;
          par->le = 1;
-         WARNX1("SND_PCM_FORMAT_U24_LE");
          break;
       case SND_PCM_FORMAT_U24_BE:
          par->bits = 24;
          par->sig = 0;
          par->le = 0;
-         WARNX1("SND_PCM_FORMAT_U24_BE");
          break;
+      case SND_PCM_FORMAT_FLOAT_LE:
+         *out_needs_conversion = true;
+         /* fallthrough */
       case SND_PCM_FORMAT_S32_LE:
          par->bits = 32;
          par->sig = 1;
          par->le = 1;
-         WARNX1("SND_PCM_FORMAT_S32_LE");
          break;
+      case SND_PCM_FORMAT_FLOAT_BE:
+         *out_needs_conversion = true;
+         /* fallthrough */
       case SND_PCM_FORMAT_S32_BE:
          par->bits = 32;
          par->sig = 1;
          par->le = 0;
-         WARNX1("SND_PCM_FORMAT_S32_BE");
          break;
       case SND_PCM_FORMAT_U32_LE:
          par->bits = 32;
          par->sig = 0;
          par->le = 1;
-         WARNX1("SND_PCM_FORMAT_U32_LE");
          break;
       case SND_PCM_FORMAT_U32_BE:
          par->bits = 32;
          par->sig = 0;
          par->le = 0;
-         WARNX1("SND_PCM_FORMAT_U32_BE");
          break;
       default:
          WARNX("unsupported format: 0x%x", format);
@@ -607,7 +654,9 @@ snd_pcm_hw_params_get_format_mask(snd_pcm_hw_params_t *params, snd_pcm_format_ma
          SND_PCM_FORMAT_S32_LE,
          SND_PCM_FORMAT_S32_BE,
          SND_PCM_FORMAT_U32_LE,
-         SND_PCM_FORMAT_U32_BE
+         SND_PCM_FORMAT_U32_BE,
+         SND_PCM_FORMAT_FLOAT_LE,
+         SND_PCM_FORMAT_FLOAT_BE
    };
    static snd_pcm_format_mask_t def_mask = { .fmts = def_fmts, .nmemb = ARRAY_SIZE(def_fmts) };
    *mask = def_mask;
@@ -629,7 +678,12 @@ int
 snd_pcm_hw_params_set_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_format_t val)
 {
    // FIXME: prob should check hw caps
-   return (pcm_format(val, &params->par) ? 0 : -1);
+   if (!pcm_format(val, &params->par, &params->needs_conversion))
+      return -1;
+
+   WARNX1(snd_pcm_format_name(val));
+   params->alsa_format = val;
+   return 0;
 }
 
 static int
@@ -675,15 +729,24 @@ snd_pcm_hw_params_get_channels(const snd_pcm_hw_params_t *params, unsigned int *
 }
 
 int
+snd_pcm_hw_params_set_channels_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val)
+{
+   if (val) {
+      if (pcm->stream == SND_PCM_STREAM_PLAYBACK) {
+         assert(sizeof(params->par.pchan) == sizeof(*val));
+         return update(pcm, &params->par, &params->par.pchan, val, sizeof(*val));
+      } else {
+         assert(sizeof(params->par.rchan) == sizeof(*val));
+         return update(pcm, &params->par, &params->par.rchan, val, sizeof(*val));
+      }
+   }
+   return 0;
+}
+
+int
 snd_pcm_hw_params_set_channels(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val)
 {
-   if (pcm->stream == SND_PCM_STREAM_PLAYBACK) {
-      assert(sizeof(params->par.pchan) == sizeof(val));
-      return update(pcm, &params->par, &params->par.pchan, &val, sizeof(val));
-   } else {
-      assert(sizeof(params->par.rchan) == sizeof(val));
-      return update(pcm, &params->par, &params->par.rchan, &val, sizeof(val));
-   }
+   return snd_pcm_hw_params_set_channels_near(pcm, params, &val);
 }
 
 int
@@ -723,10 +786,17 @@ snd_pcm_hw_params_get_rate(const snd_pcm_hw_params_t *params, unsigned int *val,
 }
 
 int
+snd_pcm_hw_params_set_rate_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
+{
+   if (dir) *dir = 0;
+   assert(sizeof(params->par.rate) == sizeof(*val));
+   return update(pcm, &params->par, &params->par.rate, val, sizeof(*val));
+}
+
+int
 snd_pcm_hw_params_set_rate(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val, int dir)
 {
-   assert(sizeof(params->par.rate) == sizeof(val));
-   return update(pcm, &params->par, &params->par.rate, &val, sizeof(val));
+   return snd_pcm_hw_params_set_rate_near(pcm, params, &val, &dir);
 }
 
 int
@@ -755,14 +825,6 @@ snd_pcm_hw_params_get_rate_max(const snd_pcm_hw_params_t *params, unsigned int *
    if (dir) *dir = 0;
    if (val) *val = max;
    return 0;
-}
-
-int
-snd_pcm_hw_params_set_rate_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
-{
-   if (dir) *dir = 0;
-   assert(sizeof(params->par.rate) == sizeof(*val));
-   return update(pcm, &params->par, &params->par.rate, val, sizeof(*val));
 }
 
 int

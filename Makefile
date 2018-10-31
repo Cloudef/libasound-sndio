@@ -22,10 +22,11 @@ all: $(libs) $(libsymlinks) $(pkgconfigs)
 	m4 -DINCLUDEDIR="$(PREFIX)$(includedir)" -DLIBDIR="$(PREFIX)$(libdir)" $^ > $@
 
 libasound.so.2.0.0: private override CPPFLAGS += -D_POSIX_SOURCE
+libasound.so.2.0.0: private override CPPFLAGS += -DBYTE_ORDER=__BYTE_ORDER -DLITTLE_ENDIAN=__LITTLE_ENDIAN -DBIG_ENDIAN=__BIG_ENDIAN
 libasound.so.2.0.0: private override CFLAGS += -Wno-unused-parameter -Wno-deprecated-declarations
 libasound.so.2.0.0: private override LDFLAGS += -Wl,--version-script=libasound.map -Wl,-soname,libasound.so.2
 libasound.so.2.0.0: private override LDLIBS += -lsndio
-libasound.so.2.0.0: libasound.c libasound.map stubs.h symversioning-hell.h
+libasound.so.2.0.0: libasound.c dsp/dsp.c libasound.map stubs.h symversioning-hell.h
 	$(LINK.c) -shared $(filter %.c,$^) $(LDLIBS) -o $@
 
 libasound.so.2: libasound.so.2.0.0
