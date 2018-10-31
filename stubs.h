@@ -492,7 +492,6 @@ snd_pcm_t *snd_async_handler_get_pcm(snd_async_handler_t *handler) { WARNX1("stu
 int snd_pcm_info(snd_pcm_t *pcm, snd_pcm_info_t *info) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_free(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_sw_params(snd_pcm_t *pcm, snd_pcm_sw_params_t *params) { WARNX1("stub"); return 0; }
-int snd_pcm_reset(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_status(snd_pcm_t *pcm, snd_pcm_status_t *status) { WARNX1("stub"); return 0; }
 int snd_pcm_hwsync(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 int snd_pcm_htimestamp(snd_pcm_t *pcm, snd_pcm_uframes_t *avail, snd_htimestamp_t *tstamp) { WARNX1("stub"); return 0; }
@@ -503,7 +502,6 @@ snd_pcm_sframes_t snd_pcm_forwardable(snd_pcm_t *pcm) { WARNX1("stub"); return 0
 snd_pcm_sframes_t snd_pcm_forward(snd_pcm_t *pcm, snd_pcm_uframes_t frames) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_writen(snd_pcm_t *pcm, void **bufs, snd_pcm_uframes_t size) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_readn(snd_pcm_t *pcm, void **bufs, snd_pcm_uframes_t size) { WARNX1("stub"); return 0; }
-int snd_pcm_wait(snd_pcm_t *pcm, int timeout) { WARNX1("stub"); return 0; }
 int snd_pcm_link(snd_pcm_t *pcm1, snd_pcm_t *pcm2) { WARNX1("stub"); return 0; }
 int snd_pcm_unlink(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 snd_pcm_chmap_query_t **snd_pcm_query_chmaps(snd_pcm_t *pcm) { WARNX1("stub"); return NULL; }

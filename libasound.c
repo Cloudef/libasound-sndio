@@ -283,6 +283,12 @@ snd_pcm_state(snd_pcm_t *pcm)
    return SND_PCM_STATE_OPEN;
 }
 
+int
+snd_pcm_wait(snd_pcm_t *pcm, int timeout)
+{
+   return 1; // we are always ready for io
+}
+
 static size_t
 io_do(snd_pcm_t *pcm, void *buffer, const size_t frames, size_t (*io)(struct sio_hdl*, void*, size_t))
 {
@@ -449,6 +455,12 @@ snd_pcm_pause(snd_pcm_t *pcm, int enable)
 {
    // FIXME: not correct, we need to do emulation
    return (enable ? snd_pcm_drain(pcm) : snd_pcm_start(pcm));
+}
+
+int
+snd_pcm_reset(snd_pcm_t *pcm)
+{
+   return (!snd_pcm_drain(pcm) && !snd_pcm_prepare(pcm) ? 0 : -1);
 }
 
 size_t
