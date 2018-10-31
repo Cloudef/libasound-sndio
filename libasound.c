@@ -327,31 +327,28 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 snd_pcm_sframes_t
 snd_pcm_avail_update(snd_pcm_t *pcm)
 {
-   while (1) {
-      struct pollfd pfd[16];
-      int nfds = sio_nfds(pcm->hdl);
-      assert((unsigned int)nfds < ARRAY_SIZE(pfd));
+   struct pollfd pfd[16];
+   int nfds = sio_nfds(pcm->hdl);
+   assert((unsigned int)nfds < ARRAY_SIZE(pfd));
 
-      // FIXME: should POLLIN / POLLOUT depending on stream
-      if (!sio_pollfd(pcm->hdl, pfd, POLLOUT)) {
-         WARNX1("sio_pollfd failed");
+   // FIXME: should POLLIN / POLLOUT depending on stream
+   if (!sio_pollfd(pcm->hdl, pfd, POLLOUT)) {
+      WARNX1("sio_pollfd failed");
+      goto fail;
+   }
+
+   // FIXME: timeout should be period time
+   errno = 0;
+   while ((nfds = poll(pfd, nfds, -1)) < 0) {
+      if (errno == EINVAL) {
+         WARNX1("poll EINVAL");
          goto fail;
       }
-
-      errno = 0;
-      while ((nfds = poll(pfd, nfds, -1)) < 0) {
-         if (errno == EINVAL) {
-            WARNX1("poll EINVAL");
-            goto fail;
-         }
-      }
-
-      const int events = sio_revents(pcm->hdl, pfd);
-      if (!(events & (POLLOUT | POLLIN)))
-         continue;
-
-      break;
    }
+
+   const int events = sio_revents(pcm->hdl, pfd);
+   if (!(events & (POLLOUT | POLLIN)))
+      goto fail;
 
    return pcm->hw.par.appbufsz;
 
