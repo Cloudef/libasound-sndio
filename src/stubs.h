@@ -389,9 +389,7 @@ int snd_mixer_class_set_private_free(snd_mixer_class_t *class_, void (*private_f
 int snd_mixer_class_set_compare(snd_mixer_class_t *class_, snd_mixer_compare_t compare) { WARNX1("stub"); return 0; }
 const char *snd_mixer_selem_channel_name(snd_mixer_selem_channel_id_t channel) { WARNX1("stub"); return NULL; }
 int snd_mixer_selem_register(snd_mixer_t *mixer, struct snd_mixer_selem_regopt *options, snd_mixer_class_t **classp) { WARNX1("stub"); return 0; }
-void snd_mixer_selem_get_id(snd_mixer_elem_t *element, snd_mixer_selem_id_t *id) { WARNX1("stub");  }
 unsigned int snd_mixer_selem_get_index(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
-snd_mixer_elem_t *snd_mixer_find_selem(snd_mixer_t *mixer, const snd_mixer_selem_id_t *id) { WARNX1("stub"); return NULL; }
 int snd_mixer_selem_is_playback_mono(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_has_playback_channel(snd_mixer_elem_t *obj, snd_mixer_selem_channel_id_t channel) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_is_capture_mono(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
@@ -421,7 +419,6 @@ int snd_mixer_selem_set_capture_dB_all(snd_mixer_elem_t *elem, long value, int d
 int snd_mixer_selem_set_capture_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_switch_all(snd_mixer_elem_t *elem, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_switch_all(snd_mixer_elem_t *elem, int value) { WARNX1("stub"); return 0; }
-int snd_mixer_selem_get_playback_volume_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume_range(snd_mixer_elem_t *elem, long min, long max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_volume_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_dB_range(snd_mixer_elem_t *elem, long *min, long *max) { WARNX1("stub"); return 0; }
@@ -437,7 +434,6 @@ size_t snd_mixer_selem_id_sizeof(void) { WARNX1("stub"); return 0; }
 void snd_mixer_selem_id_copy(snd_mixer_selem_id_t *dst, const snd_mixer_selem_id_t *src) { WARNX1("stub");  }
 const char *snd_mixer_selem_id_get_name(const snd_mixer_selem_id_t *obj) { WARNX1("stub"); return NULL; }
 unsigned int snd_mixer_selem_id_get_index(const snd_mixer_selem_id_t *obj) { WARNX1("stub"); return 0; }
-void snd_mixer_selem_id_set_name(snd_mixer_selem_id_t *obj, const char *val) { WARNX1("stub");  }
 void snd_mixer_selem_id_set_index(snd_mixer_selem_id_t *obj, unsigned int val) { WARNX1("stub");  }
 int snd_mixer_selem_compare(const snd_mixer_elem_t *c1, const snd_mixer_elem_t *c2) { WARNX1("stub"); return 0; }
 int snd_mixer_sbasic_info(const snd_mixer_class_t *class, sm_class_basic_t *info) { WARNX1("stub"); return 0; }

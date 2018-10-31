@@ -143,14 +143,16 @@ get_controls(snd_mixer_t *mixer)
       }
    }
 
+   mixer->controls = NULL;
    snd_mixer_elem_t **tail = &mixer->controls;
    for (size_t i = 0; i < ARRAY_SIZE(controls); ++i) {
       if (!controls[i].name[0])
          continue;
 
+      controls[i].next = NULL;
       controls[i].mixer = mixer;
       *tail = &controls[i];
-      tail = &(*tail)->next;
+      tail = &controls[i].next;
    }
 }
 
@@ -236,7 +238,7 @@ snd_mixer_handle_events(snd_mixer_t *mixer)
 }
 
 struct _snd_mixer_selem_id {
-   char noop;
+   const char *name;
 };
 
 int
@@ -254,6 +256,23 @@ snd_mixer_selem_id_free(snd_mixer_selem_id_t *obj)
    free(obj);
 }
 
+void
+snd_mixer_selem_id_set_name(snd_mixer_selem_id_t *obj, const char *val)
+{
+   obj->name = val;
+}
+
+snd_mixer_elem_t*
+snd_mixer_find_selem(snd_mixer_t *mixer, const snd_mixer_selem_id_t *id)
+{
+   for (snd_mixer_elem_t *elem = mixer->controls; elem; elem = elem->next) {
+      if (elem->name && id->name && !strcasecmp(elem->name, id->name))
+         return elem;
+   }
+
+   return NULL;
+}
+
 snd_mixer_elem_t*
 snd_mixer_first_elem(snd_mixer_t *mixer)
 {
@@ -266,6 +285,12 @@ snd_mixer_elem_next(snd_mixer_elem_t *elem)
    return elem->next;
 }
 
+void
+snd_mixer_selem_get_id(snd_mixer_elem_t *element, snd_mixer_selem_id_t *id)
+{
+   id->name = element->name;
+}
+
 const char*
 snd_mixer_selem_get_name(snd_mixer_elem_t *elem)
 {
@@ -276,6 +301,14 @@ int
 snd_mixer_selem_get_playback_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value)
 {
    if (value) *value = ((float)elem->vol / (float)0x7f) * 100;
+   return 0;
+}
+
+int
+snd_mixer_selem_get_playback_volume_range(snd_mixer_elem_t *elem, long *min, long *max)
+{
+   if (min) *min = 0;
+   if (max) *max = 0x7f;
    return 0;
 }
 
