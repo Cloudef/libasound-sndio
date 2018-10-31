@@ -978,4 +978,25 @@ snd_pcm_get_params(snd_pcm_t *pcm, snd_pcm_uframes_t *buffer_size, snd_pcm_ufram
    return 0;
 }
 
+snd_pcm_chmap_t*
+snd_pcm_get_chmap(snd_pcm_t *pcm)
+{
+   const unsigned int nc = (pcm->stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
+
+   snd_pcm_chmap_t *map;
+   if (!(map = calloc(1, sizeof(*map) + nc)))
+      return NULL;
+
+   map->channels = nc;
+
+   if (nc == 1) {
+      map->pos[0] = SND_CHMAP_MONO;
+   } else if (nc == 2) {
+      map->pos[0] = SND_CHMAP_FL;
+      map->pos[1] = SND_CHMAP_FR;
+   }
+
+   return map;
+}
+
 #include "symversioning-hell.h"

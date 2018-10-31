@@ -509,7 +509,6 @@ int snd_pcm_unlink(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 snd_pcm_chmap_query_t **snd_pcm_query_chmaps(snd_pcm_t *pcm) { WARNX1("stub"); return NULL; }
 snd_pcm_chmap_query_t **snd_pcm_query_chmaps_from_hw(int card, int dev, int subdev, snd_pcm_stream_t stream) { WARNX1("stub"); return NULL; }
 void snd_pcm_free_chmaps(snd_pcm_chmap_query_t **maps) { WARNX1("stub");  }
-snd_pcm_chmap_t *snd_pcm_get_chmap(snd_pcm_t *pcm) { WARNX1("stub"); return NULL; }
 int snd_pcm_set_chmap(snd_pcm_t *pcm, const snd_pcm_chmap_t *map) { WARNX1("stub"); return 0; }
 const char *snd_pcm_chmap_type_name(enum snd_pcm_chmap_type val) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_chmap_name(enum snd_pcm_chmap_position val) { WARNX1("stub"); return NULL; }
