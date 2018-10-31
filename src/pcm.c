@@ -735,10 +735,13 @@ snd_pcm_hw_params_get_channels_min(const snd_pcm_hw_params_t *params, unsigned i
 {
    const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    unsigned int min = (unsigned int)~0;
-   for (int i = 0; i < SIO_NCHAN; ++i) {
-      if (!((pb ? params->cap.confs[0].pchan : params->cap.confs[0].rchan) & (1 << i)))
-         continue;
-      min = ((pb ? params->cap.pchan[i] : params->cap.rchan[i]) < min ? (pb ? params->cap.pchan[i] : params->cap.rchan[i]) : min);
+   for (unsigned int c = 0; c < params->cap.nconf; ++c) {
+      const unsigned int cconf = (pb ? params->cap.confs[c].pchan : params->cap.confs[c].rchan);
+      for (unsigned int i = 0; i < SIO_NCHAN; ++i) {
+         if (!(cconf & (1 << i)))
+            continue;
+         min = ((pb ? params->cap.pchan[i] : params->cap.rchan[i]) < min ? (pb ? params->cap.pchan[i] : params->cap.rchan[i]) : min);
+      }
    }
    if (val) *val = min;
    return 0;
@@ -748,11 +751,14 @@ int
 snd_pcm_hw_params_get_channels_max(const snd_pcm_hw_params_t *params, unsigned int *val)
 {
    const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
-   unsigned int max = 0;
-   for (int i = 0; i < SIO_NCHAN; ++i) {
-      if (!((pb ? params->cap.confs[0].pchan : params->cap.confs[0].rchan) & (1 << i)))
-         continue;
-      max = ((pb ? params->cap.pchan[i] : params->cap.rchan[i]) > max ? (pb ? params->cap.pchan[i] : params->cap.rchan[i]) : max);
+   unsigned int max = 2;
+   for (unsigned int c = 0; c < params->cap.nconf; ++c) {
+      const unsigned int cconf = (pb ? params->cap.confs[c].pchan : params->cap.confs[c].rchan);
+      for (unsigned int i = 0; i < SIO_NCHAN; ++i) {
+         if (!(cconf & (1 << i)))
+            continue;
+         max = ((pb ? params->cap.pchan[i] : params->cap.rchan[i]) > max ? (pb ? params->cap.pchan[i] : params->cap.rchan[i]) : max);
+      }
    }
    if (val) *val = max;
    return 0;
@@ -784,10 +790,12 @@ int
 snd_pcm_hw_params_get_rate_min(const snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
 {
    unsigned int min = (unsigned int)~0;
-   for (int i = 0; i < SIO_NRATE; ++i) {
-      if (!(params->cap.confs[0].rate & (1 << i)))
-         continue;
-      min = (params->cap.rate[i] < min ? params->cap.rate[i] : min);
+   for (unsigned int c = 0; c < params->cap.nconf; ++c) {
+      for (int i = 0; i < SIO_NRATE; ++i) {
+         if (!(params->cap.confs[c].rate & (1 << i)))
+            continue;
+         min = (params->cap.rate[i] < min ? params->cap.rate[i] : min);
+      }
    }
    if (dir) *dir = 0;
    if (val) *val = min;
@@ -798,10 +806,12 @@ int
 snd_pcm_hw_params_get_rate_max(const snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
 {
    unsigned int max = 0;
-   for (int i = 0; i < SIO_NRATE; ++i) {
-      if (!(params->cap.confs[0].rate & (1 << i)))
-         continue;
-      max = (params->cap.rate[i] > max ? params->cap.rate[i] : max);
+   for (unsigned int c = 0; c < params->cap.nconf; ++c) {
+      for (int i = 0; i < SIO_NRATE; ++i) {
+         if (!(params->cap.confs[c].rate & (1 << i)))
+            continue;
+         max = (params->cap.rate[i] > max ? params->cap.rate[i] : max);
+      }
    }
    if (dir) *dir = 0;
    if (val) *val = max;
