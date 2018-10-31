@@ -76,5 +76,5 @@ preprocess()
 
 cat include/alsa/*.h | preprocess | match | tr -d ';' | while read -r fun; do
    name="$(fun_name_for "$fun")"
-   grep -Fqs "$name(" libasound.c || printf '%s { WARNX1("stub"); %s }\n' "$fun" "$(return_for "$fun" "$name")"
+   grep -Fqs "$name(" src/{libasound,pcm,mixer}.c || printf '%s { WARNX1("stub"); %s }\n' "$fun" "$(return_for "$fun" "$name")"
 done
