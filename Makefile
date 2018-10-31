@@ -48,7 +48,7 @@ install-pkgconfig: $(pkgconfigs)
 
 install-include:
 	mkdir -p "$(DESTDIR)$(PREFIX)$(includedir)"
-	cp -r include "$(DESTDIR)$(PREFIX)$(includedir)"
+	cp -r include/alsa "$(DESTDIR)$(PREFIX)$(includedir)/"
 
 install: install-lib install-symlinks install-pkgconfig install-include
 
