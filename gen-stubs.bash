@@ -21,7 +21,6 @@ should_error()
    grep -Fqs "$(cat << EOF
 _malloc
 snd_config_
-snd_ctl_
 EOF
 )" <<<"$1"
 }
