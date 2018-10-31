@@ -297,14 +297,14 @@ io_do(snd_pcm_t *pcm, void *buffer, const size_t frames, size_t (*io)(struct sio
 snd_pcm_sframes_t
 snd_pcm_bytes_to_frames(snd_pcm_t *pcm, ssize_t bytes)
 {
-   const int bpf = (pcm->hw.par.bits * pcm->hw.par.pchan) / 8;
+   const int bpf = (pcm->hw.par.bps * pcm->hw.par.pchan);
    return bytes / bpf;
 }
 
 ssize_t
 snd_pcm_frames_to_bytes(snd_pcm_t *pcm, snd_pcm_sframes_t frames)
 {
-   const int bpf = (pcm->hw.par.bits * pcm->hw.par.pchan) / 8;
+   const int bpf = (pcm->hw.par.bps * pcm->hw.par.pchan);
    return frames * bpf;
 }
 
@@ -683,6 +683,7 @@ snd_pcm_hw_params_set_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pc
 
    WARNX1(snd_pcm_format_name(val));
    params->alsa_format = val;
+   params->par.bps = SIO_BPS(params->par.bits);
    return 0;
 }
 
