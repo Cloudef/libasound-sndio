@@ -693,6 +693,14 @@ snd_pcm_format_mask_test(const snd_pcm_format_mask_t *mask, snd_pcm_format_t val
 }
 
 int
+snd_pcm_hw_params_test_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_format_t val)
+{
+   snd_pcm_format_mask_t mask;
+   snd_pcm_hw_params_get_format_mask(params, &mask);
+   return (snd_pcm_format_mask_test(&mask, val) ? 0 : -1);
+}
+
+int
 snd_pcm_hw_params_set_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_format_t val)
 {
    // FIXME: prob should check hw caps
