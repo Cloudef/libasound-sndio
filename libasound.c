@@ -202,19 +202,21 @@ device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
 int
 snd_pcm_open(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t stream, int mode)
 {
-   assert(pcm);
-
    if (!(*pcm = calloc(1, sizeof(**pcm)))) {
       WARN1("calloc");
       return -1;
    }
 
    if (!((*pcm)->hdl = device_open(*pcm, name, stream, mode)))
-      return -1;
+      goto fail;
 
    sio_initpar(&(*pcm)->hw_requested.par);
    (*pcm)->name = (name ? name : "default");
    return (sio_getcap((*pcm)->hdl, &(*pcm)->hw.cap) && sio_getpar((*pcm)->hdl, &(*pcm)->hw.par) ? 0 : -1);
+
+fail:
+   free(*pcm);
+   return -1;
 }
 
 int
