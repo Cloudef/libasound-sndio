@@ -7,6 +7,7 @@
 
 struct _snd_mixer_elem {
    snd_mixer_elem_t *next;
+   snd_mixer_t *mixer;
    char name[SYSEX_NAMELEN];
    unsigned int index, vol;
 };
@@ -33,6 +34,7 @@ onsysex(unsigned char *buf, unsigned len, snd_mixer_elem_t controls[MIXER_MAX_CH
 
    if (u.x.type == SYSEX_TYPE_RT && u.x.id0 == SYSEX_CONTROL && u.x.id1 == SYSEX_MASTER) {
       if (len == SYSEX_SIZE(master)) {
+         controls[0].index = 0;
          controls[0].vol = u.x.u.master.coarse;
          snprintf(controls[0].name, sizeof(controls[0].name), "master");
       }
@@ -48,6 +50,7 @@ onsysex(unsigned char *buf, unsigned len, snd_mixer_elem_t controls[MIXER_MAX_CH
          if (cn >= MIXER_MAX_CHANNELS || !memchr(u.x.u.mixinfo.name, '\0', SYSEX_NAMELEN))
             return false;
 
+         controls[cn + 1].index = cn + 1;
          snprintf(controls[cn + 1].name, sizeof(controls[cn + 1].name), "%s", u.x.u.mixinfo.name);
          break;
       }
@@ -146,8 +149,29 @@ get_controls(snd_mixer_t *mixer)
       if (!controls[i].name[0])
          continue;
 
+      controls[i].mixer = mixer;
       *tail = &controls[i];
       tail = &(*tail)->next;
+   }
+}
+
+static void
+setvol(snd_mixer_t *mixer, unsigned cn, unsigned vol)
+{
+   if (!cn) {
+      struct sysex msg = {
+         .start = SYSEX_START,
+         .type = SYSEX_TYPE_RT,
+         .id0 = SYSEX_CONTROL,
+         .id1 = SYSEX_MASTER,
+         .u.master.fine = 0,
+         .u.master.coarse = vol,
+         .u.master.end = SYSEX_END,
+      };
+      mio_write(mixer->hdl, &msg, SYSEX_SIZE(master));
+   } else {
+      unsigned char msg[3] = { MIDI_CTL | (cn - 1), MIDI_CTLVOL, vol };
+      mio_write(mixer->hdl, msg, sizeof(msg));
    }
 }
 
@@ -159,7 +183,7 @@ snd_mixer_open(snd_mixer_t **mixer, int mode)
       return -1;
    }
 
-   if (!((*mixer)->hdl = mio_open("snd/0", MIO_OUT | MIO_IN, 0))) {
+   if (!((*mixer)->hdl = mio_open("snd/0", MIO_OUT | MIO_IN, false))) {
       WARNX1("mio_open failed");
       goto fail;
    }
@@ -177,6 +201,38 @@ snd_mixer_close(snd_mixer_t *mixer)
 {
    mio_close(mixer->hdl);
    free(mixer);
+   return 0;
+}
+
+int
+snd_mixer_poll_descriptors_count(snd_mixer_t *mixer)
+{
+   return mio_nfds(mixer->hdl);
+}
+
+int
+snd_mixer_poll_descriptors(snd_mixer_t *mixer, struct pollfd *pfds, unsigned int space)
+{
+   if (space > (unsigned int)mio_nfds(mixer->hdl))
+      return -1;
+
+   return mio_pollfd(mixer->hdl, pfds, POLLOUT | POLLIN);
+}
+
+int
+snd_mixer_poll_descriptors_revents(snd_mixer_t *mixer, struct pollfd *pfds, unsigned int nfds, unsigned short *revents)
+{
+   if (!revents || nfds > (unsigned int)mio_nfds(mixer->hdl))
+      return -1;
+
+   *revents = mio_revents(mixer->hdl, pfds) | POLLIN;
+   return 0;
+}
+
+int
+snd_mixer_handle_events(snd_mixer_t *mixer)
+{
+   get_controls(mixer);
    return 0;
 }
 
@@ -232,6 +288,13 @@ snd_mixer_selem_get_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_
 }
 
 int
+snd_mixer_selem_set_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value, int dir)
+{
+   setvol(elem->mixer, elem->index, value + 0x7f);
+   return 0;
+}
+
+int
 snd_mixer_selem_get_playback_dB_range(snd_mixer_elem_t *elem, long *min, long *max)
 {
    if (max) *max = 0;
@@ -259,6 +322,12 @@ snd_mixer_selem_has_playback_switch(snd_mixer_elem_t *elem)
 
 int
 snd_mixer_selem_has_playback_switch_joined(snd_mixer_elem_t *elem)
+{
+   return true;
+}
+
+int
+snd_mixer_selem_is_active(snd_mixer_elem_t *elem)
 {
    return true;
 }

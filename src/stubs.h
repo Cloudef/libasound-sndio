@@ -345,15 +345,11 @@ char *snd_input_gets(snd_input_t *input, char *str, size_t size) { WARNX1("stub"
 int snd_input_getc(snd_input_t *input) { WARNX1("stub"); return 0; }
 int snd_input_ungetc(snd_input_t *input, int c) { WARNX1("stub"); return 0; }
 snd_mixer_elem_t *snd_mixer_last_elem(snd_mixer_t *mixer) { WARNX1("stub"); return NULL; }
-int snd_mixer_handle_events(snd_mixer_t *mixer) { WARNX1("stub"); return 0; }
 int snd_mixer_attach(snd_mixer_t *mixer, const char *name) { WARNX1("stub"); return 0; }
 int snd_mixer_attach_hctl(snd_mixer_t *mixer, snd_hctl_t *hctl) { WARNX1("stub"); return 0; }
 int snd_mixer_detach(snd_mixer_t *mixer, const char *name) { WARNX1("stub"); return 0; }
 int snd_mixer_detach_hctl(snd_mixer_t *mixer, snd_hctl_t *hctl) { WARNX1("stub"); return 0; }
 int snd_mixer_get_hctl(snd_mixer_t *mixer, const char *name, snd_hctl_t **hctl) { WARNX1("stub"); return 0; }
-int snd_mixer_poll_descriptors_count(snd_mixer_t *mixer) { WARNX1("stub"); return 0; }
-int snd_mixer_poll_descriptors(snd_mixer_t *mixer, struct pollfd *pfds, unsigned int space) { WARNX1("stub"); return 0; }
-int snd_mixer_poll_descriptors_revents(snd_mixer_t *mixer, struct pollfd *pfds, unsigned int nfds, unsigned short *revents) { WARNX1("stub"); return 0; }
 int snd_mixer_load(snd_mixer_t *mixer) { WARNX1("stub"); return 0; }
 void snd_mixer_free(snd_mixer_t *mixer) { WARNX1("stub");  }
 int snd_mixer_wait(snd_mixer_t *mixer, int timeout) { WARNX1("stub"); return 0; }
@@ -396,7 +392,6 @@ int snd_mixer_selem_register(snd_mixer_t *mixer, struct snd_mixer_selem_regopt *
 void snd_mixer_selem_get_id(snd_mixer_elem_t *element, snd_mixer_selem_id_t *id) { WARNX1("stub");  }
 unsigned int snd_mixer_selem_get_index(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 snd_mixer_elem_t *snd_mixer_find_selem(snd_mixer_t *mixer, const snd_mixer_selem_id_t *id) { WARNX1("stub"); return NULL; }
-int snd_mixer_selem_is_active(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_is_playback_mono(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_has_playback_channel(snd_mixer_elem_t *obj, snd_mixer_selem_channel_id_t channel) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_is_capture_mono(snd_mixer_elem_t *elem) { WARNX1("stub"); return 0; }
@@ -419,7 +414,6 @@ int snd_mixer_selem_get_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_
 int snd_mixer_selem_get_capture_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value) { WARNX1("stub"); return 0; }
-int snd_mixer_selem_set_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value, int dir) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value, int dir) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume_all(snd_mixer_elem_t *elem, long value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_volume_all(snd_mixer_elem_t *elem, long value) { WARNX1("stub"); return 0; }
