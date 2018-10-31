@@ -318,6 +318,7 @@ snd_pcm_drain(snd_pcm_t *pcm)
    if (pcm->started && sio_stop(pcm->hdl)) {
       pcm->started = false;
       pcm->written = pcm->position = 0;
+      pcm->avail = 0;
    }
 
    return (!pcm->started ? 0 : -1);
