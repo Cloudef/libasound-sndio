@@ -2,7 +2,6 @@
 #include <sndio.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <time.h>
 #include "util/sysex.h"
 #include "util/util.h"
 
@@ -16,7 +15,6 @@ struct _snd_mixer_elem {
 struct _snd_mixer {
    struct mio_hdl *hdl;
    snd_mixer_elem_t *controls;
-   uint64_t last_pollin_time;
 };
 
 #define MIXER_MAX_CHANNELS 16
@@ -220,14 +218,6 @@ snd_mixer_poll_descriptors(snd_mixer_t *mixer, struct pollfd *pfds, unsigned int
    return mio_pollfd(mixer->hdl, pfds, POLLOUT | POLLIN);
 }
 
-static uint64_t
-get_time_ns(void)
-{
-   struct timespec ts;
-   clock_gettime(CLOCK_MONOTONIC, &ts);
-   return (uint64_t)ts.tv_sec * (uint64_t)1e9 + (uint64_t)ts.tv_nsec;
-}
-
 int
 snd_mixer_poll_descriptors_revents(snd_mixer_t *mixer, struct pollfd *pfds, unsigned int nfds, unsigned short *revents)
 {
@@ -235,16 +225,6 @@ snd_mixer_poll_descriptors_revents(snd_mixer_t *mixer, struct pollfd *pfds, unsi
       return -1;
 
    *revents = mio_revents(mixer->hdl, pfds);
-
-   const uint64_t time = get_time_ns();
-   if (!(*revents & POLLIN)) {
-      if (((time - mixer->last_pollin_time) / 1e6) > 20)
-         *revents |= POLLIN;
-   }
-
-   if (*revents & POLLIN)
-      mixer->last_pollin_time = time;
-
    return 0;
 }
 
