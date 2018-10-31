@@ -11,6 +11,7 @@ struct _snd_pcm_hw_params {
    struct sio_par par;
    snd_pcm_format_t alsa_format;
    snd_pcm_access_t access;
+   snd_pcm_stream_t stream;
    bool needs_conversion; // for unsupported formats
 };
 
@@ -22,7 +23,6 @@ struct _snd_pcm {
    struct sio_hdl *hdl;
    const char *name;
    snd_pcm_uframes_t position, written, avail;
-   snd_pcm_stream_t stream;
    int mode;
    bool started;
 };
@@ -70,6 +70,7 @@ device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
 
    sio_onmove(hdl, onmove, pcm);
    pcm->mode = mode;
+   pcm->hw.stream = stream;
    return hdl;
 }
 
@@ -117,7 +118,7 @@ snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
    snd_pcm_drain(pcm);
    sio_close(pcm->hdl);
 
-   if (!(pcm->hdl = device_open(pcm, pcm->name, pcm->stream, (nonblock ? SND_PCM_NONBLOCK : false))))
+   if (!(pcm->hdl = device_open(pcm, pcm->name, pcm->hw.stream, (nonblock ? SND_PCM_NONBLOCK : false))))
       return -1;
 
    return snd_pcm_hw_params(pcm, &pcm->hw_requested);
@@ -135,7 +136,7 @@ snd_pcm_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space
    if (space > (unsigned int)sio_nfds(pcm->hdl))
       return -1;
 
-   return sio_pollfd(pcm->hdl, pfds, (pcm->stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
+   return sio_pollfd(pcm->hdl, pfds, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
 }
 
 int
@@ -176,8 +177,8 @@ io_do(snd_pcm_t *pcm, void *buffer, const size_t frames, size_t (*io)(struct sio
       };
 
       struct conv dec, enc;
-      dec_init(&dec, &params, pcm->hw.par.pchan);
-      enc_init(&enc, &params, pcm->hw.par.pchan);
+      dec_init(&dec, &params, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan));
+      enc_init(&enc, &params, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan));
 
       size_t total_frames = frames, io_bytes = 0;
       unsigned char decoded[4096], encoded[sizeof(decoded)];
@@ -209,20 +210,27 @@ io_do(snd_pcm_t *pcm, void *buffer, const size_t frames, size_t (*io)(struct sio
 snd_pcm_sframes_t
 snd_pcm_bytes_to_frames(snd_pcm_t *pcm, ssize_t bytes)
 {
-   const int bpf = (pcm->hw.par.bps * pcm->hw.par.pchan);
+   const unsigned int chans = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
+   const int bpf = (pcm->hw.par.bps * chans);
    return bytes / bpf;
 }
 
 ssize_t
 snd_pcm_frames_to_bytes(snd_pcm_t *pcm, snd_pcm_sframes_t frames)
 {
-   const int bpf = (pcm->hw.par.bps * pcm->hw.par.pchan);
+   const unsigned int chans = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
+   const int bpf = (pcm->hw.par.bps * chans);
    return frames * bpf;
 }
 
 snd_pcm_sframes_t
 snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 {
+   if (pcm->hw.stream != SND_PCM_STREAM_PLAYBACK) {
+      WARNX1("trying to write to capture stream :/");
+      return 0;
+   }
+
    const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, (void*)buffer, size, (size_t(*)(struct sio_hdl*, void*, size_t))sio_write));
    pcm->written += ret;
    pcm->avail -= ret;
@@ -232,6 +240,11 @@ snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 snd_pcm_sframes_t
 snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 {
+   if (pcm->hw.stream != SND_PCM_STREAM_CAPTURE) {
+      WARNX1("trying to read from playback stream :/");
+      return 0;
+   }
+
    const snd_pcm_sframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, buffer, size, sio_read));
    pcm->written += ret;
    pcm->avail -= ret;
@@ -245,7 +258,7 @@ snd_pcm_avail_update(snd_pcm_t *pcm)
    int nfds = sio_nfds(pcm->hdl);
    assert((unsigned int)nfds < ARRAY_SIZE(pfd));
 
-   nfds = sio_pollfd(pcm->hdl, pfd, (pcm->stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
+   nfds = sio_pollfd(pcm->hdl, pfd, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
 
    // XXX: timeout should be period time/buffer time(?)
    errno = 0;
@@ -364,9 +377,10 @@ int
 snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 {
    params->cap = pcm->hw.cap;
+   params->stream = pcm->hw.stream;
    sio_initpar(&params->par);
    copy_important_params(&params->par, &pcm->hw.par);
-   WARNX("rate: %u, round: %u, appbufsz: %u pchan: %u", params->par.rate, params->par.round, params->par.appbufsz, params->par.pchan);
+   WARNX("rate: %u, round: %u, appbufsz: %u chan: %u", params->par.rate, params->par.round, params->par.appbufsz, (params->stream == SND_PCM_STREAM_PLAYBACK ? params->par.pchan : params->par.rchan));
    return 0;
 }
 
@@ -389,7 +403,7 @@ snd_pcm_hw_params(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
       }
    }
 
-   WARNX("rate: %u, round: %u, appbufsz: %u, bufsz: %u, pchan: %u", pcm->hw.par.rate, pcm->hw.par.round, pcm->hw.par.appbufsz, pcm->hw.par.bufsz, pcm->hw.par.pchan);
+   WARNX("rate: %u, round: %u, appbufsz: %u, bufsz: %u, chan: %u", pcm->hw.par.rate, pcm->hw.par.round, pcm->hw.par.appbufsz, pcm->hw.par.bufsz, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan));
    return snd_pcm_prepare(pcm);
 }
 
@@ -534,6 +548,18 @@ pcm_format(const snd_pcm_format_t format, struct sio_par *par, bool *out_needs_c
    return true;
 }
 
+int snd_pcm_format_width(snd_pcm_format_t format)
+{
+   struct sio_par par = {0};
+   pcm_format(format, &par, (bool[]){false});
+   return par.bits;
+}
+
+int snd_pcm_format_physical_width(snd_pcm_format_t format)
+{
+   return snd_pcm_format_width(format);
+}
+
 struct _snd_pcm_format_mask {
    snd_pcm_format_t *fmts;
    uint8_t nmemb;
@@ -654,8 +680,7 @@ update(snd_pcm_t *pcm, struct sio_par *par, void *curv, void *newv, const size_t
 int
 snd_pcm_hw_params_get_channels(const snd_pcm_hw_params_t *params, unsigned int *val)
 {
-   // FIXME: need to store stream info in params
-   if (val) *val = params->par.pchan;
+   if (val) *val = (params->stream == SND_PCM_STREAM_PLAYBACK ? params->par.pchan : params->par.rchan);
    return 0;
 }
 
@@ -663,7 +688,7 @@ int
 snd_pcm_hw_params_set_channels_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val)
 {
    if (val) {
-      if (pcm->stream == SND_PCM_STREAM_PLAYBACK) {
+      if (params->stream == SND_PCM_STREAM_PLAYBACK) {
          assert(sizeof(params->par.pchan) == sizeof(*val));
          return update(pcm, &params->par, &params->par.pchan, val, sizeof(*val));
       } else {
@@ -683,12 +708,12 @@ snd_pcm_hw_params_set_channels(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsi
 int
 snd_pcm_hw_params_get_channels_min(const snd_pcm_hw_params_t *params, unsigned int *val)
 {
-   // FIXME: need to store stream info in params
+   const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    unsigned int min = (unsigned int)~0;
    for (int i = 0; i < SIO_NCHAN; ++i) {
-      if (!(params->cap.confs[0].pchan & (1 << i)))
+      if (!((pb ? params->cap.confs[0].pchan : params->cap.confs[0].rchan) & (1 << i)))
          continue;
-      min = (params->cap.pchan[i] < min ? params->cap.pchan[i] : min);
+      min = ((pb ? params->cap.pchan[i] : params->cap.rchan[i]) < min ? (pb ? params->cap.pchan[i] : params->cap.rchan[i]) : min);
    }
    if (val) *val = min;
    return 0;
@@ -697,12 +722,12 @@ snd_pcm_hw_params_get_channels_min(const snd_pcm_hw_params_t *params, unsigned i
 int
 snd_pcm_hw_params_get_channels_max(const snd_pcm_hw_params_t *params, unsigned int *val)
 {
-   // FIXME: need to store stream info in params
+   const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    unsigned int max = 0;
    for (int i = 0; i < SIO_NCHAN; ++i) {
-      if (!(params->cap.confs[0].pchan & (1 << i)))
+      if (!((pb ? params->cap.confs[0].pchan : params->cap.confs[0].rchan) & (1 << i)))
          continue;
-      max = (params->cap.pchan[i] > max ? params->cap.pchan[i] : max);
+      max = ((pb ? params->cap.pchan[i] : params->cap.rchan[i]) > max ? (pb ? params->cap.pchan[i] : params->cap.rchan[i]) : max);
    }
    if (val) *val = max;
    return 0;
@@ -769,7 +794,7 @@ int
 snd_pcm_hw_params_set_buffer_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
 {
    if (val) {
-      unsigned int newv = *val;
+      unsigned int newv = (*val < params->par.round ? params->par.round * 2 : *val);
       assert(sizeof(params->par.appbufsz) == sizeof(newv));
       const int ret = update(pcm, &params->par, &params->par.appbufsz, &newv, sizeof(newv));
       *val = newv;
@@ -804,8 +829,14 @@ int
 snd_pcm_hw_params_set_period_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val, int *dir)
 {
    if (dir) *dir = 0;
-   assert(sizeof(params->par.round) == sizeof(*val));
-   return update(pcm, &params->par, &params->par.round, val, sizeof(*val));
+   if (val) {
+      unsigned int newv = *val;
+      assert(sizeof(params->par.round) == sizeof(newv));
+      const int ret = update(pcm, &params->par, &params->par.round, &newv, sizeof(newv));
+      *val = newv;
+      return ret;
+   }
+   return 0;
 }
 
 int
@@ -891,7 +922,7 @@ snd_pcm_get_params(snd_pcm_t *pcm, snd_pcm_uframes_t *buffer_size, snd_pcm_ufram
 snd_pcm_chmap_t*
 snd_pcm_get_chmap(snd_pcm_t *pcm)
 {
-   const unsigned int nc = (pcm->stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
+   const unsigned int nc = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
 
    snd_pcm_chmap_t *map;
    if (!(map = calloc(1, sizeof(*map) + nc)))

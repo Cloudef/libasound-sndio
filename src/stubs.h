@@ -702,8 +702,6 @@ int snd_pcm_format_float(snd_pcm_format_t format) { WARNX1("stub"); return 0; }
 int snd_pcm_format_little_endian(snd_pcm_format_t format) { WARNX1("stub"); return 0; }
 int snd_pcm_format_big_endian(snd_pcm_format_t format) { WARNX1("stub"); return 0; }
 int snd_pcm_format_cpu_endian(snd_pcm_format_t format) { WARNX1("stub"); return 0; }
-int snd_pcm_format_width(snd_pcm_format_t format)			/* in bits */ { WARNX1("stub"); return 0; }
-int snd_pcm_format_physical_width(snd_pcm_format_t format)		/* in bits */ { WARNX1("stub"); return 0; }
 snd_pcm_format_t snd_pcm_build_linear_format(int width, int pwidth, int unsignd, int big_endian) { WARNX1("stub"); return 0; }
 ssize_t snd_pcm_format_size(snd_pcm_format_t format, size_t samples) { WARNX1("stub"); return 0; }
 uint8_t snd_pcm_format_silence(snd_pcm_format_t format) { WARNX1("stub"); return 0; }
