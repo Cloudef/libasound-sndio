@@ -66,13 +66,13 @@ snd_card_get_index(const char *name)
 int
 snd_card_get_name(int card, char **name)
 {
-   if (name) *name = "default";
+   if (name) *name = c_strdup("default");
    return 0;
 }
 
 int snd_card_get_longname(int card, char **name)
 {
-   if (name) *name = "default";
+   if (name) *name = c_strdup("default");
    return 0;
 }
 
