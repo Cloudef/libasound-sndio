@@ -10,7 +10,7 @@ struct _snd_mixer_elem {
    snd_mixer_elem_t *next;
    snd_mixer_t *mixer;
    char name[SYSEX_NAMELEN];
-   unsigned int index, vol;
+   unsigned int index, vol, muted_vol;
 };
 
 struct _snd_mixer {
@@ -94,7 +94,6 @@ get_controls(snd_mixer_t *mixer)
    };
 
    static snd_mixer_elem_t controls[MIXER_MAX_CHANNELS + 1];
-   memset(controls, 0, sizeof(controls));
 
    unsigned char buf[0x100];
    mio_write(mixer->hdl, dumpreq, sizeof(dumpreq));
@@ -310,8 +309,7 @@ snd_mixer_selem_get_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_
 int
 snd_mixer_selem_set_playback_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value, int dir)
 {
-   setvol(elem->mixer, elem->index, value + 0x7f);
-   elem->vol = value + 0x7f;
+   setvol(elem->mixer, elem->index, (elem->vol = value + 0x7f));
    return 0;
 }
 
@@ -320,6 +318,26 @@ snd_mixer_selem_get_playback_dB_range(snd_mixer_elem_t *elem, long *min, long *m
 {
    if (max) *max = 0;
    if (min) *min = -127;
+   return 0;
+}
+
+int
+snd_mixer_selem_get_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int *value)
+{
+   *value = (elem->vol > 0);
+   return 0;
+}
+
+int
+snd_mixer_selem_set_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int value)
+{
+   if (value) {
+      elem->muted_vol = (elem->muted_vol ? elem->muted_vol : 10);
+      setvol(elem->mixer, elem->index, (elem->vol = elem->muted_vol));
+   } else {
+      elem->muted_vol = elem->vol;
+      setvol(elem->mixer, elem->index, (elem->vol = 0));
+   }
    return 0;
 }
 

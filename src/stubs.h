@@ -410,7 +410,6 @@ int snd_mixer_selem_ask_playback_dB_vol(snd_mixer_elem_t *elem, long dBvalue, in
 int snd_mixer_selem_ask_capture_dB_vol(snd_mixer_elem_t *elem, long dBvalue, int dir, long *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_dB(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long *value) { WARNX1("stub"); return 0; }
-int snd_mixer_selem_get_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_get_capture_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int *value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_volume(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, long value) { WARNX1("stub"); return 0; }
@@ -419,7 +418,6 @@ int snd_mixer_selem_set_playback_volume_all(snd_mixer_elem_t *elem, long value) 
 int snd_mixer_selem_set_capture_volume_all(snd_mixer_elem_t *elem, long value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_dB_all(snd_mixer_elem_t *elem, long value, int dir) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_dB_all(snd_mixer_elem_t *elem, long value, int dir) { WARNX1("stub"); return 0; }
-int snd_mixer_selem_set_playback_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_switch(snd_mixer_elem_t *elem, snd_mixer_selem_channel_id_t channel, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_playback_switch_all(snd_mixer_elem_t *elem, int value) { WARNX1("stub"); return 0; }
 int snd_mixer_selem_set_capture_switch_all(snd_mixer_elem_t *elem, int value) { WARNX1("stub"); return 0; }
