@@ -242,6 +242,31 @@ snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
    return snd_pcm_hw_params(pcm, &pcm->hw_requested);
 }
 
+int
+snd_pcm_poll_descriptors_count(snd_pcm_t *pcm)
+{
+   return sio_nfds(pcm->hdl);
+}
+
+int
+snd_pcm_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space)
+{
+   if (space > (unsigned int)sio_nfds(pcm->hdl))
+      return -1;
+
+   return sio_pollfd(pcm->hdl, pfds, (pcm->stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
+}
+
+int
+snd_pcm_poll_descriptors_revents(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int nfds, unsigned short *revents)
+{
+   if (!revents || nfds > (unsigned int)sio_nfds(pcm->hdl))
+      return -1;
+
+   *revents = sio_revents(pcm->hdl, pfds);
+   return 0;
+}
+
 snd_pcm_state_t
 snd_pcm_state(snd_pcm_t *pcm)
 {
@@ -331,11 +356,7 @@ snd_pcm_avail_update(snd_pcm_t *pcm)
    int nfds = sio_nfds(pcm->hdl);
    assert((unsigned int)nfds < ARRAY_SIZE(pfd));
 
-   // FIXME: should POLLIN / POLLOUT depending on stream
-   if (!sio_pollfd(pcm->hdl, pfd, POLLOUT)) {
-      WARNX1("sio_pollfd failed");
-      goto fail;
-   }
+   nfds = sio_pollfd(pcm->hdl, pfd, (pcm->stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
 
    // FIXME: timeout should be period time
    errno = 0;

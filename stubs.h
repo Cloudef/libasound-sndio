@@ -487,9 +487,6 @@ int snd_pcm_open_lconf(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t strea
 int snd_pcm_open_fallback(snd_pcm_t **pcm, snd_config_t *root, const char *name, const char *orig_name, snd_pcm_stream_t stream, int mode) { WARNX1("stub"); return 0; }
 snd_pcm_type_t snd_pcm_type(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
 snd_pcm_stream_t snd_pcm_stream(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
-int snd_pcm_poll_descriptors_count(snd_pcm_t *pcm) { WARNX1("stub"); return 0; }
-int snd_pcm_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space) { WARNX1("stub"); return 0; }
-int snd_pcm_poll_descriptors_revents(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int nfds, unsigned short *revents) { WARNX1("stub"); return 0; }
 int snd_async_add_pcm_handler(snd_async_handler_t **handler, snd_pcm_t *pcm, snd_async_callback_t callback, void *private_data) { WARNX1("stub"); return 0; }
 snd_pcm_t *snd_async_handler_get_pcm(snd_async_handler_t *handler) { WARNX1("stub"); return NULL; }
 int snd_pcm_info(snd_pcm_t *pcm, snd_pcm_info_t *info) { WARNX1("stub"); return 0; }
