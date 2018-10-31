@@ -137,6 +137,7 @@ struct _snd_pcm_hw_params {
    struct sio_cap cap;
    struct sio_par par;
    snd_pcm_format_t alsa_format;
+   snd_pcm_access_t access;
    bool needs_conversion; // for unsupported formats
 };
 
@@ -532,11 +533,19 @@ snd_pcm_hw_params_set_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pc
    if (_access != SND_PCM_ACCESS_RW_INTERLEAVED)
       goto fail;
 
+   params->access = _access;
    return 0;
 
 fail:
    WARNX("access mode `0x%x` not supported yet", _access);
    return -1;
+}
+
+int
+snd_pcm_hw_params_get_access(const snd_pcm_hw_params_t *params, snd_pcm_access_t *_access)
+{
+   if (_access) *_access = params->access;
+   return 0;
 }
 
 const char*

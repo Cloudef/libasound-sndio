@@ -552,7 +552,6 @@ int snd_pcm_hw_params_get_rate_numden(const snd_pcm_hw_params_t *params, unsigne
 int snd_pcm_hw_params_get_sbits(const snd_pcm_hw_params_t *params) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_get_fifo_size(const snd_pcm_hw_params_t *params) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_try_explain_failure(snd_pcm_t *pcm, snd_pcm_hw_params_t *fail, snd_pcm_hw_params_t *success, unsigned int depth, snd_output_t *out) { WARNX1("stub"); return 0; }
-int snd_pcm_hw_params_get_access(const snd_pcm_hw_params_t *params, snd_pcm_access_t *_access) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_test_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_set_access_first(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t *_access) { WARNX1("stub"); return 0; }
 int snd_pcm_hw_params_set_access_last(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t *_access) { WARNX1("stub"); return 0; }
