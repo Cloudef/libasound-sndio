@@ -958,8 +958,10 @@ snd_pcm_get_chmap(snd_pcm_t *pcm)
    const unsigned int nc = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
 
    snd_pcm_chmap_t *map;
-   if (!(map = calloc(1, sizeof(*map) + nc)))
+   if (!(map = calloc(1, sizeof(*map) + nc))) {
+      WARN1("calloc");
       return NULL;
+   }
 
    map->channels = nc;
 
