@@ -638,10 +638,8 @@ int
 snd_pcm_format_mask_test(const snd_pcm_format_mask_t *mask, snd_pcm_format_t val)
 {
    for (uint8_t i = 0; i < mask->nmemb; ++i) {
-      if (mask->fmts[i] != val)
-         continue;
-
-      return true;
+      if (mask->fmts[i] == val)
+         return true;
    }
    return false;
 }
