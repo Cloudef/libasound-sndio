@@ -673,7 +673,6 @@ const char *snd_pcm_access_name(const snd_pcm_access_t _access) { WARNX1("stub")
 const char *snd_pcm_format_description(const snd_pcm_format_t format) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_subformat_name(const snd_pcm_subformat_t subformat) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_subformat_description(const snd_pcm_subformat_t subformat) { WARNX1("stub"); return NULL; }
-snd_pcm_format_t snd_pcm_format_value(const char* name) { WARNX1("stub"); return 0; }
 const char *snd_pcm_tstamp_mode_name(const snd_pcm_tstamp_t mode) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_state_name(const snd_pcm_state_t state) { WARNX1("stub"); return NULL; }
 int snd_pcm_dump(snd_pcm_t *pcm, snd_output_t *out) { WARNX1("stub"); return 0; }

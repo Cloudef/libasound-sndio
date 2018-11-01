@@ -460,6 +460,25 @@ snd_pcm_hw_params_get_access(const snd_pcm_hw_params_t *params, snd_pcm_access_t
    return 0;
 }
 
+static snd_pcm_format_t SUPPORTED_FORMATS[] = {
+   SND_PCM_FORMAT_U8,
+   SND_PCM_FORMAT_S8,
+   SND_PCM_FORMAT_S16_LE,
+   SND_PCM_FORMAT_S16_BE,
+   SND_PCM_FORMAT_U16_LE,
+   SND_PCM_FORMAT_U16_BE,
+   SND_PCM_FORMAT_S24_LE,
+   SND_PCM_FORMAT_S24_BE,
+   SND_PCM_FORMAT_U24_LE,
+   SND_PCM_FORMAT_U24_BE,
+   SND_PCM_FORMAT_S32_LE,
+   SND_PCM_FORMAT_S32_BE,
+   SND_PCM_FORMAT_U32_LE,
+   SND_PCM_FORMAT_U32_BE,
+   SND_PCM_FORMAT_FLOAT_LE,
+   SND_PCM_FORMAT_FLOAT_BE
+};
+
 const char*
 snd_pcm_format_name(const snd_pcm_format_t format)
 {
@@ -486,6 +505,17 @@ snd_pcm_format_name(const snd_pcm_format_t format)
          return NULL;
    }
 #undef NAME
+}
+
+snd_pcm_format_t
+snd_pcm_format_value(const char* name)
+{
+   for (uint8_t i = 0; i < ARRAY_SIZE(SUPPORTED_FORMATS); ++i) {
+      const char *needle = snd_pcm_format_name(SUPPORTED_FORMATS[i]);
+      if (name && !strcmp(needle, name))
+         return SUPPORTED_FORMATS[i];
+   }
+   return SND_PCM_FORMAT_UNKNOWN;
 }
 
 static bool
@@ -612,25 +642,7 @@ snd_pcm_hw_params_free(snd_pcm_hw_params_t *obj)
 void
 snd_pcm_hw_params_get_format_mask(snd_pcm_hw_params_t *params, snd_pcm_format_mask_t *mask)
 {
-   static snd_pcm_format_t def_fmts[] = {
-         SND_PCM_FORMAT_U8,
-         SND_PCM_FORMAT_S8,
-         SND_PCM_FORMAT_S16_LE,
-         SND_PCM_FORMAT_S16_BE,
-         SND_PCM_FORMAT_U16_LE,
-         SND_PCM_FORMAT_U16_BE,
-         SND_PCM_FORMAT_S24_LE,
-         SND_PCM_FORMAT_S24_BE,
-         SND_PCM_FORMAT_U24_LE,
-         SND_PCM_FORMAT_U24_BE,
-         SND_PCM_FORMAT_S32_LE,
-         SND_PCM_FORMAT_S32_BE,
-         SND_PCM_FORMAT_U32_LE,
-         SND_PCM_FORMAT_U32_BE,
-         SND_PCM_FORMAT_FLOAT_LE,
-         SND_PCM_FORMAT_FLOAT_BE
-   };
-   static snd_pcm_format_mask_t def_mask = { .fmts = def_fmts, .nmemb = ARRAY_SIZE(def_fmts) };
+   static snd_pcm_format_mask_t def_mask = { .fmts = SUPPORTED_FORMATS, .nmemb = ARRAY_SIZE(SUPPORTED_FORMATS) };
    if (mask) *mask = def_mask;
 }
 
