@@ -759,7 +759,6 @@ snd_pcm_hw_params_set_channels_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params,
 int
 snd_pcm_hw_params_set_channels(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val)
 {
-   WARNX("%u", val);
    return snd_pcm_hw_params_set_channels_near(pcm, params, &val);
 }
 
@@ -768,7 +767,6 @@ snd_pcm_hw_params_get_channels_min(const snd_pcm_hw_params_t *params, unsigned i
 {
    const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    if (val) *val = (pb ? params->limits.pchan[0] : params->limits.rchan[0]);
-   WARNX("%u", (val ? *val : 0));
    return 0;
 }
 
@@ -777,7 +775,6 @@ snd_pcm_hw_params_get_channels_max(const snd_pcm_hw_params_t *params, unsigned i
 {
    const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    if (val) *val = (pb ? params->limits.pchan[1] : params->limits.rchan[1]);
-   WARNX("%u", (val ? *val : 0));
    return 0;
 }
 
