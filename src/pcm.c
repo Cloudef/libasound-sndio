@@ -600,8 +600,7 @@ int
 snd_pcm_hw_params_malloc(snd_pcm_hw_params_t **ptr)
 {
    // OpenAL-soft uses this :(
-   *ptr = calloc(1, sizeof(**ptr));
-   return (*ptr ? 0 : -1);
+   return ((*ptr = calloc(1, sizeof(**ptr))) ? 0 : -1);
 }
 
 void
@@ -920,8 +919,7 @@ int
 snd_pcm_sw_params_malloc(snd_pcm_sw_params_t **ptr)
 {
    // OpenAL-soft uses this :(
-   *ptr = calloc(1, sizeof(**ptr));
-   return (*ptr ? 0 : -1);
+   return ((*ptr = calloc(1, sizeof(**ptr))) ? 0 : -1);
 }
 
 void

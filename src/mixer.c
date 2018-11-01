@@ -244,10 +244,7 @@ struct _snd_mixer_selem_id {
 int
 snd_mixer_selem_id_malloc(snd_mixer_selem_id_t **ptr)
 {
-   if (!(*ptr = calloc(1, sizeof(**ptr))))
-      return -1;
-
-   return 0;
+   return ((*ptr = calloc(1, sizeof(**ptr))) ? 0 : -1);
 }
 
 void
