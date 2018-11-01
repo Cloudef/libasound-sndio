@@ -180,7 +180,7 @@ int
 snd_mixer_open(snd_mixer_t **mixer, int mode)
 {
    if (!(*mixer = calloc(1, sizeof(**mixer)))) {
-      WARNX1("calloc");
+      WARN1("calloc");
       return -1;
    }
 
