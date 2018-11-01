@@ -860,7 +860,7 @@ int
 snd_pcm_hw_params_set_buffer_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
 {
    if (val) {
-      unsigned int newv = (*val < params->par.round ? params->par.round * 2 : *val);
+      unsigned int newv = (*val < params->par.round * 2 ? params->par.round * 2 : *val);
       assert(sizeof(params->par.appbufsz) == sizeof(newv));
       const int ret = update(pcm, &params->par, &params->par.appbufsz, &newv, sizeof(newv));
       *val = newv;
@@ -884,14 +884,14 @@ snd_pcm_hw_params_set_buffer_size(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, s
 int
 snd_pcm_hw_params_get_buffer_size_min(const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
 {
-   if (val) *val = params->par.appbufsz;
+   if (val) *val = params->par.round * 2;
    return 0;
 }
 
 int
 snd_pcm_hw_params_get_buffer_size_max(const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
 {
-   if (val) *val = params->par.appbufsz;
+   if (val) *val = params->par.bufsz;
    return 0;
 }
 
