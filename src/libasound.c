@@ -308,7 +308,31 @@ snd_ctl_card_info_get_name(const snd_ctl_card_info_t *obj)
 }
 
 const char*
+snd_ctl_card_info_get_id(const snd_ctl_card_info_t *obj)
+{
+   return snd_ctl_card_info_get_name(obj);
+}
+
+const char*
+snd_ctl_card_info_get_driver(const snd_ctl_card_info_t *obj)
+{
+   return snd_ctl_card_info_get_name(obj);
+}
+
+const char*
+snd_ctl_card_info_get_longname(const snd_ctl_card_info_t *obj)
+{
+   return snd_ctl_card_info_get_name(obj);
+}
+
+const char*
 snd_ctl_card_info_get_mixername(const snd_ctl_card_info_t *obj)
+{
+   return snd_ctl_card_info_get_name(obj);
+}
+
+const char*
+snd_ctl_card_info_get_components(const snd_ctl_card_info_t *obj)
 {
    return snd_ctl_card_info_get_name(obj);
 }

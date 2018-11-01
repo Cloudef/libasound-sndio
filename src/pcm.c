@@ -95,13 +95,16 @@ struct _snd_pcm_hw_params {
       snd_pcm_format_t supported[ARRAY_SIZE(SUPPORTED_FORMATS)];
       unsigned int pchan[2], rchan[2], rate[2];
    } limits;
+   int period_time;
    snd_pcm_format_t format;
    snd_pcm_access_t access;
    snd_pcm_stream_t stream;
    bool needs_conversion; // for unsupported formats
 };
 
-struct _snd_pcm_sw_params { char noop; };
+struct _snd_pcm_sw_params {
+   snd_pcm_uframes_t avail_min;
+};
 
 struct _snd_pcm {
    struct _snd_pcm_hw_params hw;
@@ -239,6 +242,7 @@ snd_pcm_open(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t stream, int mod
 
    dump_cap(name, &(*pcm)->hw.cap, &(*pcm)->hw.limits);
    (*pcm)->hw.format = SND_PCM_FORMAT_UNKNOWN;
+   (*pcm)->hw.period_time = -1;
    return 0;
 
 fail:
@@ -308,12 +312,6 @@ snd_pcm_state(snd_pcm_t *pcm)
       return SND_PCM_STATE_RUNNING;
 
    return SND_PCM_STATE_OPEN;
-}
-
-int
-snd_pcm_wait(snd_pcm_t *pcm, int timeout)
-{
-   return 1; // we are always ready for io
 }
 
 snd_pcm_sframes_t
@@ -438,34 +436,61 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
    return ret;
 }
 
+static uint64_t
+get_time_ns(void)
+{
+   struct timespec ts;
+   clock_gettime(CLOCK_MONOTONIC, &ts);
+   return (uint64_t)ts.tv_sec * (uint64_t)1e9 + (uint64_t)ts.tv_nsec;
+}
+
+int
+snd_pcm_wait(snd_pcm_t *pcm, int timeout)
+{
+   while (1) {
+      const uint64_t start = get_time_ns();
+
+      struct pollfd pfd[16];
+      int nfds = sio_nfds(pcm->hdl);
+      assert((unsigned int)nfds < ARRAY_SIZE(pfd));
+
+      const int want = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN);
+      nfds = sio_pollfd(pcm->hdl, pfd, want);
+
+      errno = 0;
+      while ((nfds = poll(pfd, nfds, timeout)) < 0) {
+         if (errno == EINVAL) {
+            WARNX1("poll EINVAL");
+            goto nodata;
+         } else if (errno == EINTR) {
+            WARNX1("poll EINTR");
+            goto nodata;
+         } else if (errno != EAGAIN)
+            goto nodata; // timeout
+      }
+
+      if (timeout > 0) {
+         const uint64_t delta = ((get_time_ns() - start) / 1e6);
+         if ((uint64_t)timeout <= delta)
+            goto nodata; // timeout;
+
+         timeout -= delta;
+      }
+
+      if (sio_revents(pcm->hdl, pfd) & want)
+         break;
+   }
+   return 1;
+
+nodata:
+   return 0;
+}
+
 snd_pcm_sframes_t
 snd_pcm_avail_update(snd_pcm_t *pcm)
 {
-   struct pollfd pfd[16];
-   int nfds = sio_nfds(pcm->hdl);
-   assert((unsigned int)nfds < ARRAY_SIZE(pfd));
-
-   nfds = sio_pollfd(pcm->hdl, pfd, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
-
-   // XXX: timeout should be period time/buffer time(?)
-   errno = 0;
-   while ((nfds = poll(pfd, nfds, -1)) < 0) {
-      if (errno == EINVAL) {
-         WARNX1("poll EINVAL");
-         goto nodata;
-      }
-   }
-
-   const int revents = sio_revents(pcm->hdl, pfd);
-   if (!(revents & POLLOUT) && !(revents & POLLIN))
-      goto nodata;
-
+   while (snd_pcm_wait(pcm, pcm->hw.period_time) && pcm->avail < pcm->sw.avail_min);
    return (pcm->avail > pcm->hw.par.appbufsz ? pcm->hw.par.appbufsz : pcm->avail);
-
-nodata:
-   // NOTE: returning 1, as some programs don't check the return value :/ (namely qwebengine)
-   //       thus they SIGFPE by dividing by 0 or -1
-   return 1;
 }
 
 snd_pcm_sframes_t
@@ -477,7 +502,7 @@ snd_pcm_avail(snd_pcm_t *pcm)
 int
 snd_pcm_delay(snd_pcm_t *pcm, snd_pcm_sframes_t *delayp)
 {
-   if (delayp) *delayp = pcm->written - pcm->position;
+   if (delayp) *delayp = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->written - pcm->position : pcm->position - pcm->written);
    return 0;
 }
 
@@ -845,6 +870,18 @@ snd_pcm_hw_params_set_buffer_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *para
 }
 
 int
+snd_pcm_hw_params_set_buffer_size_min(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
+{
+   return snd_pcm_hw_params_set_buffer_size_near(pcm, params, val);
+}
+
+int
+snd_pcm_hw_params_set_buffer_size(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t val)
+{
+   return snd_pcm_hw_params_set_buffer_size_near(pcm, params, &val);
+}
+
+int
 snd_pcm_hw_params_get_buffer_size_min(const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
 {
    if (val) *val = params->par.appbufsz;
@@ -928,7 +965,22 @@ int
 snd_pcm_hw_params_get_periods_max(const snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
 {
    if (dir) *dir = 0;
-   if (val) *val = 32;
+   if (val) *val = params->par.appbufsz / params->par.round;
+   return 0;
+}
+
+int
+snd_pcm_hw_params_set_period_time(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val, int dir)
+{
+   params->period_time = val / (uint64_t)1e3;
+   return 0;
+}
+
+int
+snd_pcm_hw_params_set_period_time_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
+{
+   if (dir) *dir = 0;
+   if (val) snd_pcm_hw_params_set_period_time(pcm, params, *val, 0);
    return 0;
 }
 
@@ -951,9 +1003,23 @@ snd_pcm_sw_params_free(snd_pcm_sw_params_t *ptr)
 }
 
 int
+snd_pcm_sw_params(snd_pcm_t *pcm, snd_pcm_sw_params_t *params)
+{
+   pcm->sw = *params;
+   return 0;
+}
+
+int
 snd_pcm_sw_params_current(snd_pcm_t *pcm, snd_pcm_sw_params_t *params)
 {
    *params = pcm->sw;
+   return 0;
+}
+
+int
+snd_pcm_sw_params_set_avail_min(snd_pcm_t *pcm, snd_pcm_sw_params_t *params, snd_pcm_uframes_t val)
+{
+   params->avail_min = val;
    return 0;
 }
 
