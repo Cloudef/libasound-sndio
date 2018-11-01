@@ -25,6 +25,8 @@ do_debug(void)
 #define ERR(x, y, ...) do { err(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 static inline char*
 c_strdup(const char *str)
