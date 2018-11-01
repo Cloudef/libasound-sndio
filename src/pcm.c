@@ -6,7 +6,7 @@
 #include "util/dsp.h"
 #include "util/util.h"
 
-static struct format_info {
+static const struct format_info {
    const char *name;
    snd_pcm_format_t fmt;
    struct sio_enc enc;
@@ -82,6 +82,12 @@ snd_pcm_format_physical_width(snd_pcm_format_t format)
    return (info ? (int)info->enc.bps * 8 : -1);
 }
 
+ssize_t
+snd_pcm_format_size(snd_pcm_format_t format, size_t samples)
+{
+   return samples * snd_pcm_format_physical_width(format) / 8;
+}
+
 struct _snd_pcm_hw_params {
    struct sio_cap cap;
    struct sio_par par;
@@ -100,6 +106,7 @@ struct _snd_pcm_sw_params { char noop; };
 struct _snd_pcm {
    struct _snd_pcm_hw_params hw;
    struct _snd_pcm_sw_params sw;
+   struct timespec start_time;
    struct sio_hdl *hdl;
    const char *name;
    snd_pcm_uframes_t position, written, avail;
@@ -481,6 +488,7 @@ snd_pcm_prepare(snd_pcm_t *pcm)
       pcm->started = true;
       pcm->written = pcm->position = 0;
       pcm->avail = pcm->hw.par.bufsz;
+      clock_gettime(CLOCK_MONOTONIC, &pcm->start_time);
    }
 
    return (pcm->started ? 0 : -1);
@@ -620,6 +628,15 @@ snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 }
 
 int
+snd_pcm_hw_params_test_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access)
+{
+   if (_access != SND_PCM_ACCESS_RW_INTERLEAVED)
+      return -1;
+
+   return 0;
+}
+
+int
 snd_pcm_hw_params_set_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access)
 {
    if (_access != SND_PCM_ACCESS_RW_INTERLEAVED)
@@ -643,7 +660,6 @@ snd_pcm_hw_params_get_access(const snd_pcm_hw_params_t *params, snd_pcm_access_t
 int
 snd_pcm_hw_params_malloc(snd_pcm_hw_params_t **ptr)
 {
-   // OpenAL-soft uses this :(
    return ((*ptr = calloc(1, sizeof(**ptr))) ? 0 : -1);
 }
 
@@ -743,6 +759,7 @@ snd_pcm_hw_params_set_channels_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params,
 int
 snd_pcm_hw_params_set_channels(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val)
 {
+   WARNX("%u", val);
    return snd_pcm_hw_params_set_channels_near(pcm, params, &val);
 }
 
@@ -751,6 +768,7 @@ snd_pcm_hw_params_get_channels_min(const snd_pcm_hw_params_t *params, unsigned i
 {
    const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    if (val) *val = (pb ? params->limits.pchan[0] : params->limits.rchan[0]);
+   WARNX("%u", (val ? *val : 0));
    return 0;
 }
 
@@ -759,6 +777,7 @@ snd_pcm_hw_params_get_channels_max(const snd_pcm_hw_params_t *params, unsigned i
 {
    const bool pb = (params->stream == SND_PCM_STREAM_PLAYBACK);
    if (val) *val = (pb ? params->limits.pchan[1] : params->limits.rchan[1]);
+   WARNX("%u", (val ? *val : 0));
    return 0;
 }
 
@@ -767,6 +786,14 @@ snd_pcm_hw_params_get_rate(const snd_pcm_hw_params_t *params, unsigned int *val,
 {
    if (dir) *dir = 0;
    if (val) *val = params->par.rate;
+   return 0;
+}
+
+int
+snd_pcm_hw_params_get_rate_numden(const snd_pcm_hw_params_t *params, unsigned int *rate_num, unsigned int *rate_den)
+{
+   if (rate_num) *rate_num = params->par.rate;
+   if (rate_den) *rate_den = 1;
    return 0;
 }
 
@@ -892,6 +919,22 @@ snd_pcm_hw_params_set_periods_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, 
    return 0;
 }
 
+int
+snd_pcm_hw_params_get_periods_min(const snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
+{
+   if (dir) *dir = 0;
+   if (val) *val = 2;
+   return 0;
+}
+
+int
+snd_pcm_hw_params_get_periods_max(const snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
+{
+   if (dir) *dir = 0;
+   if (val) *val = 32;
+   return 0;
+}
+
 size_t
 snd_pcm_sw_params_sizeof(void)
 {
@@ -901,7 +944,6 @@ snd_pcm_sw_params_sizeof(void)
 int
 snd_pcm_sw_params_malloc(snd_pcm_sw_params_t **ptr)
 {
-   // OpenAL-soft uses this :(
    return ((*ptr = calloc(1, sizeof(**ptr))) ? 0 : -1);
 }
 
@@ -959,4 +1001,63 @@ snd_pcm_get_chmap(snd_pcm_t *pcm)
    }
 
    return map;
+}
+
+struct _snd_pcm_status {
+   struct timespec start, end;
+   snd_pcm_sframes_t delay;
+};
+
+size_t
+snd_pcm_status_sizeof(void)
+{
+   return sizeof(snd_pcm_status_t);
+}
+
+int
+snd_pcm_status_malloc(snd_pcm_status_t **ptr)
+{
+   return ((*ptr = calloc(1, sizeof(**ptr))) ? 0 : -1);
+}
+
+void
+snd_pcm_status_free(snd_pcm_status_t *obj)
+{
+   free(obj);
+}
+
+int
+snd_pcm_status(snd_pcm_t *pcm, snd_pcm_status_t *status)
+{
+   *status = (snd_pcm_status_t){ .start = pcm->start_time };
+   snd_pcm_delay(pcm, &status->delay);
+   return (clock_gettime(CLOCK_MONOTONIC, &status->end) == 0 ? 0 : -1);
+}
+
+void
+snd_pcm_status_get_htstamp(const snd_pcm_status_t *obj, snd_htimestamp_t *ptr)
+{
+   snd_htimestamp_t ats = {0};
+   if ((obj->end.tv_nsec - obj->start.tv_nsec) < 0) {
+      ats.tv_sec = obj->end.tv_sec - obj->start.tv_sec - 1;
+      ats.tv_nsec = (uint64_t)1e9 + obj->end.tv_nsec - obj->start.tv_nsec;
+   } else {
+      ats.tv_sec = obj->end.tv_sec - obj->start.tv_sec;
+      ats.tv_nsec = obj->end.tv_nsec - obj->start.tv_nsec;
+   }
+   *ptr = ats;
+}
+
+void
+snd_pcm_status_get_tstamp(const snd_pcm_status_t *obj, snd_timestamp_t *ptr)
+{
+   snd_htimestamp_t ats;
+   snd_pcm_status_get_htstamp(obj, &ats);
+   *ptr = (snd_timestamp_t){ .tv_sec = ats.tv_sec, .tv_usec = ats.tv_nsec / (uint64_t)1e3 };
+}
+
+snd_pcm_sframes_t
+snd_pcm_status_get_delay(const snd_pcm_status_t *obj)
+{
+   return obj->delay;
 }
