@@ -144,7 +144,7 @@ int
 snd_ctl_open(snd_ctl_t **ctl, const char *name, int mode)
 {
    int id;
-   if ((id = snd_card_get_index(name)) < 0)
+   if ((id = snd_card_get_index((name ? name : "default"))) < 0)
       return -1;
 
    if (!(*ctl = calloc(1, sizeof(**ctl)))) {
