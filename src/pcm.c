@@ -483,7 +483,7 @@ snd_pcm_format_name(const snd_pcm_format_t format)
       NAME(SND_PCM_FORMAT_FLOAT_BE);
       default:
          WARNX("unsupported format: 0x%x", format);
-         return "unsupported";
+         return NULL;
    }
 #undef NAME
 }
