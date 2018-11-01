@@ -130,7 +130,7 @@ sndio_mode(int mode)
    switch (mode) {
       case SND_PCM_NONBLOCK: WARNX1("SND_PCM_NONBLOCK"); return true;
       // ASYNC: SIGIO will be emitted whenever a period has been completely processed by the soundcard.
-      case SND_PCM_ASYNC: ERRX1(EXIT_FAILURE, "SND_PCM_ASYNC is not supported");
+      case SND_PCM_ASYNC: WARNX1("SND_PCM_ASYNC is not supported"); return false;
    }
    return false;
 }
