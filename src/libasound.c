@@ -235,7 +235,7 @@ snd_ctl_pcm_info(snd_ctl_t *ctl, snd_pcm_info_t *info)
       return -1;
 
    info->card = ctl->id;
-   return (PCMS[info->id].stream == info->stream ? 0 : -1);
+   return (PCMS[info->id].stream == info->stream ? 0 : -ENOENT);
 }
 
 const char*
