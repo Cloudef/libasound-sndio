@@ -289,8 +289,10 @@ snd_pcm_poll_descriptors_count(snd_pcm_t *pcm)
 int
 snd_pcm_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space)
 {
-   if (space > (unsigned int)sio_nfds(pcm->hdl))
+   if (space < (unsigned int)sio_nfds(pcm->hdl)) {
+      WARNX("not enough space: %u < %d", space, sio_nfds(pcm->hdl));
       return -1;
+   }
 
    return sio_pollfd(pcm->hdl, pfds, (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? POLLOUT : POLLIN));
 }
@@ -298,10 +300,13 @@ snd_pcm_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space
 int
 snd_pcm_poll_descriptors_revents(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int nfds, unsigned short *revents)
 {
-   if (!revents || nfds > (unsigned int)sio_nfds(pcm->hdl))
+   if (nfds < (unsigned int)sio_nfds(pcm->hdl)) {
+      WARNX("not enough space: %u < %d", nfds, sio_nfds(pcm->hdl));
       return -1;
+   }
 
-   *revents = sio_revents(pcm->hdl, pfds);
+   const int ret = sio_revents(pcm->hdl, pfds);
+   if (revents) *revents = ret;
    return 0;
 }
 
