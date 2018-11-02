@@ -706,9 +706,7 @@ snd_pcm_hw_params_free(snd_pcm_hw_params_t *obj)
    free(obj);
 }
 
-struct _snd_pcm_format_mask {
-   snd_pcm_format_t supported[ARRAY_SIZE(SUPPORTED_FORMATS)];
-};
+struct _snd_pcm_format_mask { bool noop; };
 
 size_t
 snd_pcm_format_mask_sizeof(void)
@@ -719,17 +717,17 @@ snd_pcm_format_mask_sizeof(void)
 int
 snd_pcm_format_mask_test(const snd_pcm_format_mask_t *mask, snd_pcm_format_t val)
 {
-   for (size_t i = 0; i < ARRAY_SIZE(mask->supported) && mask->supported[i] != SND_PCM_FORMAT_UNKNOWN; ++i) {
-      if (mask->supported[i] == val)
+   for (size_t i = 0; i < ARRAY_SIZE(SUPPORTED_FORMATS); ++i) {
+      if (SUPPORTED_FORMATS[i].fmt == val)
          return true;
    }
+   WARNX("format `0x%x` not supported by yet", val);
    return false;
 }
 
 void
 snd_pcm_hw_params_get_format_mask(snd_pcm_hw_params_t *params, snd_pcm_format_mask_t *mask)
 {
-   if (mask) memcpy(mask->supported, params->limits.supported, sizeof(mask->supported));
 }
 
 int
@@ -740,16 +738,30 @@ snd_pcm_hw_params_test_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_p
    return (snd_pcm_format_mask_test(&mask, val) ? 0 : -1);
 }
 
+static bool
+has_native_support(snd_pcm_hw_params_t *params, snd_pcm_format_t val)
+{
+   for (size_t i = 0; i < ARRAY_SIZE(params->limits.supported) && params->limits.supported[i] != SND_PCM_FORMAT_UNKNOWN; ++i) {
+      if (params->limits.supported[i] == val)
+         return true;
+   }
+   return false;
+}
+
 int
 snd_pcm_hw_params_set_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_format_t val)
 {
    const struct format_info *info;
-   if (!(info = format_info_for_format(val)))
+   if (!(info = format_info_for_format(val))) {
+      WARNX("format `0x%x` not supported yet", val);
       return -1;
+   }
 
    params->format = val;
    WARNX("%s", info->name);
-   params->needs_conversion = (snd_pcm_hw_params_test_format(pcm, params, val) != 0);
+
+   if ((params->needs_conversion = !has_native_support(params, val)))
+      WARNX1("format needs to be transcoded!");
 
    const struct sio_par old = params->par;
    params->par.bits = info->enc.bits;
