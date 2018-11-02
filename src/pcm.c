@@ -522,6 +522,7 @@ int
 snd_pcm_prepare(snd_pcm_t *pcm)
 {
    if (!pcm->started && sio_start(pcm->hdl)) {
+      WARNX("started");
       pcm->started = true;
       pcm->written = pcm->position = 0;
       pcm->avail = pcm->hw.par.bufsz;
@@ -541,6 +542,7 @@ int
 snd_pcm_drain(snd_pcm_t *pcm)
 {
    if (pcm->started && sio_stop(pcm->hdl)) {
+      WARNX("stopped");
       pcm->started = false;
       pcm->written = pcm->position = 0;
       pcm->avail = 0;
@@ -667,8 +669,10 @@ snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 int
 snd_pcm_hw_params_test_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access)
 {
-   if (_access != SND_PCM_ACCESS_RW_INTERLEAVED)
+   if (_access != SND_PCM_ACCESS_RW_INTERLEAVED) {
+      WARNX("access mode `0x%x` not supported yet", _access);
       return -1;
+   }
 
    return 0;
 }
@@ -676,15 +680,11 @@ snd_pcm_hw_params_test_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_p
 int
 snd_pcm_hw_params_set_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access)
 {
-   if (_access != SND_PCM_ACCESS_RW_INTERLEAVED)
-      goto fail;
+   if (snd_pcm_hw_params_test_access(pcm, params, _access) != 0)
+      return -1;
 
    params->access = _access;
    return 0;
-
-fail:
-   WARNX("access mode `0x%x` not supported yet", _access);
-   return -1;
 }
 
 int
@@ -794,6 +794,7 @@ int
 snd_pcm_hw_params_set_channels_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val)
 {
    if (val) {
+      WARNX("%u", *val);
       if (params->stream == SND_PCM_STREAM_PLAYBACK) {
          assert(sizeof(params->par.pchan) == sizeof(*val));
          return update(pcm, &params->par, &params->par.pchan, val, sizeof(*val));
@@ -847,6 +848,7 @@ int
 snd_pcm_hw_params_set_rate_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
 {
    if (dir) *dir = 0;
+   if (val) WARNX("%u", *val);
    assert(sizeof(params->par.rate) == sizeof(*val));
    return update(pcm, &params->par, &params->par.rate, val, sizeof(*val));
 }
@@ -884,6 +886,7 @@ int
 snd_pcm_hw_params_set_buffer_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val)
 {
    if (val) {
+      WARNX("%lu", *val);
       unsigned int newv = (*val < params->par.round * 2 ? params->par.round * 2 : *val);
       assert(sizeof(params->par.appbufsz) == sizeof(newv));
       const int ret = update(pcm, &params->par, &params->par.appbufsz, &newv, sizeof(newv));
@@ -932,6 +935,7 @@ snd_pcm_hw_params_set_period_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *para
 {
    if (dir) *dir = 0;
    if (val) {
+      WARNX("%lu", *val);
       unsigned int newv = *val;
       assert(sizeof(params->par.round) == sizeof(newv));
       const int ret = update(pcm, &params->par, &params->par.round, &newv, sizeof(newv));
@@ -960,6 +964,7 @@ snd_pcm_hw_params_get_period_size_max(const snd_pcm_hw_params_t *params, snd_pcm
 int
 snd_pcm_hw_params_set_period_time(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val, int dir)
 {
+   WARNX("%u", val);
    params->period_time = val / (uint64_t)1e3;
    return 0;
 }
@@ -985,6 +990,7 @@ snd_pcm_hw_params_set_periods_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, 
 {
    if (dir) *dir = 0;
    if (val) {
+      WARNX("%u", *val);
       unsigned int round = params->par.appbufsz / *val;
       assert(sizeof(params->par.round) == sizeof(round));
       return update(pcm, &params->par, &params->par.round, &round, sizeof(*val));
@@ -1043,6 +1049,7 @@ snd_pcm_sw_params_current(snd_pcm_t *pcm, snd_pcm_sw_params_t *params)
 int
 snd_pcm_sw_params_set_avail_min(snd_pcm_t *pcm, snd_pcm_sw_params_t *params, snd_pcm_uframes_t val)
 {
+   WARNX("%ld", val);
    params->avail_min = val;
    return 0;
 }
