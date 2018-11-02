@@ -26,8 +26,8 @@ static const struct format_info {
    FMT(SND_PCM_FORMAT_S32_BE, 24, 4, 1, 0, 1),
    FMT(SND_PCM_FORMAT_U32_LE, 24, 4, 0, 1, 1),
    FMT(SND_PCM_FORMAT_U32_BE, 24, 4, 0, 0, 1),
-   FMT(SND_PCM_FORMAT_FLOAT_LE, 32, 4, 1, 1, 0), // always transcoded
-   FMT(SND_PCM_FORMAT_FLOAT_BE, 32, 4, 1, 0, 0) // always transcoded
+   FMT(SND_PCM_FORMAT_FLOAT_LE, 32, 4, 1, 1, 1), // always transcoded
+   FMT(SND_PCM_FORMAT_FLOAT_BE, 32, 4, 1, 0, 1) // always transcoded
 #undef FMT
 };
 
