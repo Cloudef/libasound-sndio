@@ -369,7 +369,8 @@ io_do(snd_pcm_t *pcm, const void *buffer, const size_t frames, size_t (*io)(stru
       const size_t enc_frames = sizeof(encoded) / (params[1].bps * chans);
       const size_t max_frames = MIN(dec_frames, enc_frames);
       for (const unsigned char *p = buffer; total_frames > 0;) {
-         const int todo_frames = (total_frames > max_frames ? max_frames : total_frames);
+         const int todo_frames = MIN(max_frames, total_frames);
+         assert(todo_frames <= total_frames);
          total_frames -= todo_frames;
 
          // sadly can't function pointer here as some formats may need different parameters for decoder
