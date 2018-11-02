@@ -369,7 +369,7 @@ io_do(snd_pcm_t *pcm, const void *buffer, const size_t frames, size_t (*io)(stru
       const size_t enc_frames = sizeof(encoded) / (params[1].bps * chans);
       const size_t max_frames = MIN(dec_frames, enc_frames);
       for (const unsigned char *p = buffer; total_frames > 0;) {
-         const int todo_frames = MIN(max_frames, total_frames);
+         const size_t todo_frames = MIN(max_frames, total_frames);
          assert(todo_frames <= total_frames);
          total_frames -= todo_frames;
 
@@ -523,7 +523,7 @@ int
 snd_pcm_prepare(snd_pcm_t *pcm)
 {
    if (!pcm->started && sio_start(pcm->hdl)) {
-      WARNX("started");
+      WARNX1("started");
       pcm->started = true;
       pcm->written = pcm->position = 0;
       pcm->avail = pcm->hw.par.bufsz;
@@ -543,7 +543,7 @@ int
 snd_pcm_drain(snd_pcm_t *pcm)
 {
    if (pcm->started && sio_stop(pcm->hdl)) {
-      WARNX("stopped");
+      WARNX1("stopped");
       pcm->started = false;
       pcm->written = pcm->position = 0;
       pcm->avail = 0;
