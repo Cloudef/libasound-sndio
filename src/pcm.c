@@ -127,8 +127,8 @@ static int
 sndio_stream(snd_pcm_stream_t stream)
 {
    switch (stream) {
-      case SND_PCM_STREAM_PLAYBACK: return SIO_PLAY;
-      case SND_PCM_STREAM_CAPTURE: return SIO_REC;
+      case SND_PCM_STREAM_PLAYBACK: WARNX1("SND_PCM_STREAM_PLAYBACK"); return SIO_PLAY;
+      case SND_PCM_STREAM_CAPTURE: WARNX1("SND_PCM_STREAM_CAPTURE"); return SIO_REC;
    }
    ERRX(EXIT_FAILURE, "unknown stream: %u", stream);
 }
