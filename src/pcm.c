@@ -941,6 +941,21 @@ snd_pcm_hw_params_get_period_size_max(const snd_pcm_hw_params_t *params, snd_pcm
 }
 
 int
+snd_pcm_hw_params_set_period_time(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val, int dir)
+{
+   params->period_time = val / (uint64_t)1e3;
+   return 0;
+}
+
+int
+snd_pcm_hw_params_set_period_time_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
+{
+   if (dir) *dir = 0;
+   if (val) snd_pcm_hw_params_set_period_time(pcm, params, *val, 0);
+   return 0;
+}
+
+int
 snd_pcm_hw_params_get_periods(const snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
 {
    if (dir) *dir = 0;
@@ -973,21 +988,6 @@ snd_pcm_hw_params_get_periods_max(const snd_pcm_hw_params_t *params, unsigned in
 {
    if (dir) *dir = 0;
    if (val) *val = params->par.appbufsz / params->par.round;
-   return 0;
-}
-
-int
-snd_pcm_hw_params_set_period_time(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val, int dir)
-{
-   params->period_time = val / (uint64_t)1e3;
-   return 0;
-}
-
-int
-snd_pcm_hw_params_set_period_time_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
-{
-   if (dir) *dir = 0;
-   if (val) snd_pcm_hw_params_set_period_time(pcm, params, *val, 0);
    return 0;
 }
 
