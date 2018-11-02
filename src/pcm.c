@@ -476,6 +476,9 @@ snd_pcm_wait(snd_pcm_t *pcm, int timeout)
             goto nodata; // timeout
       }
 
+      if (sio_revents(pcm->hdl, pfd) & want)
+         break;
+
       if (timeout > 0) {
          const uint64_t delta = ((get_time_ns() - start) / 1e6);
          if ((uint64_t)timeout <= delta)
@@ -483,9 +486,6 @@ snd_pcm_wait(snd_pcm_t *pcm, int timeout)
 
          timeout -= delta;
       }
-
-      if (sio_revents(pcm->hdl, pfd) & want)
-         break;
    }
    return 1;
 
