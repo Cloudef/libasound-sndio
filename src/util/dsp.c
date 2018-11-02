@@ -666,7 +666,7 @@ f32_to_adata(unsigned int x)
 	 */
 	if (e < 127 - (ADATA_BITS - 1))
 		y = 0;
-	else if (e > 127)
+	else if (e >= 127)
 		y = ADATA_UNIT - 1;
 	else
 		y = m >> (127 + (32 - ADATA_BITS) - e);
