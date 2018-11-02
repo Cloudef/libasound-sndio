@@ -68,6 +68,12 @@ snd_pcm_format_name(const snd_pcm_format_t format)
    return (info ? info->name : NULL);
 }
 
+const char*
+snd_pcm_format_description(const snd_pcm_format_t format)
+{
+   return snd_pcm_format_name(format);
+}
+
 int
 snd_pcm_format_width(snd_pcm_format_t format)
 {

@@ -634,7 +634,6 @@ snd_pcm_uframes_t snd_pcm_status_get_overrange(const snd_pcm_status_t *obj) { WA
 const char *snd_pcm_type_name(snd_pcm_type_t type) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_stream_name(const snd_pcm_stream_t stream) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_access_name(const snd_pcm_access_t _access) { WARNX1("stub"); return NULL; }
-const char *snd_pcm_format_description(const snd_pcm_format_t format) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_subformat_name(const snd_pcm_subformat_t subformat) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_subformat_description(const snd_pcm_subformat_t subformat) { WARNX1("stub"); return NULL; }
 const char *snd_pcm_tstamp_mode_name(const snd_pcm_tstamp_t mode) { WARNX1("stub"); return NULL; }
