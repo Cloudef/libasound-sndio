@@ -862,7 +862,7 @@ snd_pcm_hw_params_test_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_p
 }
 
 static bool
-has_native_support(snd_pcm_hw_params_t *params, snd_pcm_format_t val)
+has_native_support(const snd_pcm_hw_params_t *params, snd_pcm_format_t val)
 {
    for (size_t i = 0; i < ARRAY_SIZE(params->limits.supported) && params->limits.supported[i] != SND_PCM_FORMAT_UNKNOWN; ++i) {
       if (params->limits.supported[i] == val)
