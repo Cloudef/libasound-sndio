@@ -458,6 +458,11 @@ snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
       return 0;
    }
 
+   if (!pcm->started) {
+      WARNX1("playback hasn't been started");
+      return 0;
+   }
+
    const struct io io = { .read = cb_buffer_read, .write = cb_sio_write };
    struct io_state state = { .pcm = pcm, .ptr = buffer, .end = (unsigned char*)buffer + snd_pcm_frames_to_bytes(pcm, size) };
 
@@ -496,6 +501,11 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 {
    if (pcm->hw.stream != SND_PCM_STREAM_CAPTURE) {
       WARNX1("trying to read from playback stream :/");
+      return 0;
+   }
+
+   if (!pcm->started) {
+      WARNX1("recording hasn't been started");
       return 0;
    }
 
