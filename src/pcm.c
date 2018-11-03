@@ -177,11 +177,6 @@ onmove(void *arg, int delta)
 static struct sio_hdl*
 device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
 {
-   if (stream == SND_PCM_STREAM_CAPTURE) {
-      WARNX1("capture streams are broken right now, sorry");
-      return NULL;
-   }
-
    const char *sndio_name = (!name || !strcmp(name, "default") ? SIO_DEVANY : name);
 
    struct sio_hdl *hdl;
@@ -651,7 +646,7 @@ snd_pcm_prepare(snd_pcm_t *pcm)
       WARNX1("started");
       pcm->started = true;
       pcm->written = pcm->position = 0;
-      pcm->avail = pcm->hw.par.bufsz;
+      pcm->avail = pcm->hw.par.bufsz * (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK);
       clock_gettime(CLOCK_MONOTONIC, &pcm->start_time);
    }
 
