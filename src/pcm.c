@@ -609,13 +609,13 @@ snd_pcm_sframes_t
 snd_pcm_avail_update(snd_pcm_t *pcm)
 {
    while (snd_pcm_wait(pcm, pcm->hw.period_time) && pcm->avail < pcm->sw.avail_min);
-   return (pcm->avail > pcm->hw.par.appbufsz ? pcm->hw.par.appbufsz : pcm->avail);
+   return MIN(pcm->avail, pcm->hw.par.appbufsz);
 }
 
 snd_pcm_sframes_t
 snd_pcm_avail(snd_pcm_t *pcm)
 {
-   return (pcm->avail > pcm->hw.par.appbufsz ? pcm->hw.par.appbufsz : pcm->avail);
+   return MIN(pcm->avail, pcm->hw.par.appbufsz);
 }
 
 int
@@ -1013,7 +1013,7 @@ snd_pcm_hw_params_set_buffer_size_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *para
 {
    if (val) {
       WARNX("%lu", *val);
-      unsigned int newv = (*val < params->par.round * 2 ? params->par.round * 2 : *val);
+      unsigned int newv = MAX(*val, params->par.round * 2);
       assert(sizeof(params->par.appbufsz) == sizeof(newv));
       const int ret = update(pcm, &params->par, &params->par.appbufsz, &newv, sizeof(newv));
       *val = newv;
