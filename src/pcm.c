@@ -177,6 +177,11 @@ onmove(void *arg, int delta)
 static struct sio_hdl*
 device_open(snd_pcm_t *pcm, const char *name, snd_pcm_stream_t stream, int mode)
 {
+   if (stream == SND_PCM_STREAM_CAPTURE) {
+      WARNX1("capture streams are broken right now, sorry");
+      return NULL;
+   }
+
    const char *sndio_name = (!name || !strcmp(name, "default") ? SIO_DEVANY : name);
 
    struct sio_hdl *hdl;
