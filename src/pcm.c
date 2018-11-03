@@ -509,12 +509,6 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
       ret = snd_pcm_bytes_to_frames(pcm, io.read(buffer, snd_pcm_frames_to_bytes(pcm, size), &state));
    }
 
-   static size_t old_ret;
-   if (ret != old_ret) {
-      WARNX("%lu %lu %lu", pcm->avail, size, ret);
-      old_ret = ret;
-   }
-
    assert(pcm->avail >= ret);
    pcm->written += ret;
    pcm->avail -= ret;
