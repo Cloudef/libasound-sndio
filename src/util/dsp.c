@@ -440,6 +440,61 @@ resamp_init(struct resamp *p, unsigned int iblksz,
 #endif
 }
 
+static inline unsigned int
+adata_to_f32(int x)
+{
+	union {
+		float f; // assumes ieee754
+		unsigned int x;
+	} u = { .f = (float)x / ADATA_UNIT };
+	return u.x;
+}
+
+void
+enc_do_float(struct conv *p, unsigned char *in, unsigned char *out, int todo)
+{
+	unsigned int f;
+	adata_t *idata;
+	unsigned int s;
+	unsigned int obps;
+	unsigned int i;
+	unsigned char *odata;
+	int obnext;
+	int osnext;
+
+#ifdef DEBUG
+	if (log_level >= 4) {
+		log_puts("enc: copying ");
+		log_putu(todo);
+		log_puts(" frames\n");
+	}
+#endif
+	/*
+	 * Partially copy structures into local variables, to avoid
+	 * unnecessary indirections; this also allows the compiler to
+	 * order local variables more "cache-friendly".
+	 */
+	idata = (adata_t *)in;
+	odata = out;
+	obps = p->bps;
+	obnext = p->bnext;
+	osnext = p->snext;
+
+	/*
+	 * Start conversion.
+	 */
+	odata += p->bfirst;
+	for (f = todo * p->nch; f > 0; f--) {
+		s = adata_to_f32((int)*idata++);
+		for (i = obps; i > 0; i--) {
+			*odata = (unsigned char)s;
+			s >>= 8;
+			odata += obnext;
+		}
+		odata += osnext;
+	}
+}
+
 /*
  * encode "todo" frames from native to foreign encoding
  */

@@ -341,68 +341,103 @@ snd_pcm_frames_to_bytes(snd_pcm_t *pcm, snd_pcm_sframes_t frames)
    return frames * bpf;
 }
 
+struct io {
+   size_t (*read)(void *buffer, size_t size, void *arg);
+   size_t (*write)(const void *buffer, size_t size, void *arg);
+};
+
+struct io_state {
+   snd_pcm_t *pcm;
+   const unsigned char *ptr, *end;
+};
+
 static size_t
-io_do(snd_pcm_t *pcm, const void *buffer, const size_t frames, size_t (*io)(struct sio_hdl*, const void*, size_t, void*), void *arg)
+convert(snd_pcm_t *pcm, const size_t frames, const struct io *io, void *arg)
 {
-   if (pcm->hw.needs_conversion) {
-      const struct format_info *info = format_info_for_format(pcm->hw.format);
-      assert(info);
+   const struct format_info *info = format_info_for_format(pcm->hw.format);
+   assert(info);
 
-      struct aparams params[2] = {
-         {
-            .bps = info->enc.bps,
-            .bits = info->enc.bits,
-            .le = info->enc.le,
-            .sig = info->enc.sig,
-            .msb = info->enc.msb
-         }, {
-            .bps = pcm->hw.par.bps,
-            .bits = pcm->hw.par.bits,
-            .le = pcm->hw.par.le,
-            .sig = pcm->hw.par.sig,
-            .msb = pcm->hw.par.msb
-         }
-      };
+   struct aparams params[2] = {
+      {
+         .bps = info->enc.bps,
+         .bits = info->enc.bits,
+         .le = info->enc.le,
+         .sig = info->enc.sig,
+         .msb = info->enc.msb
+      }, {
+         .bps = pcm->hw.par.bps,
+         .bits = pcm->hw.par.bits,
+         .le = pcm->hw.par.le,
+         .sig = pcm->hw.par.sig,
+         .msb = pcm->hw.par.msb
+      }
+   };
 
-      struct conv dec, enc;
-      const unsigned int chans = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
-      dec_init(&dec, &params[0], chans);
-      enc_init(&enc, &params[1], chans);
+   const unsigned int di = (pcm->hw.stream == SND_PCM_STREAM_CAPTURE);
+   const unsigned int ei = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK);
+   const unsigned int chans = (ei ? pcm->hw.par.pchan : pcm->hw.par.rchan);
 
-      size_t total_frames = frames, io_bytes = 0;
-      unsigned char decoded[4096], encoded[sizeof(decoded)];
-      const size_t dec_frames = sizeof(decoded) / (params[0].bps * chans);
-      const size_t enc_frames = sizeof(encoded) / (params[1].bps * chans);
-      const size_t max_frames = MIN(dec_frames, enc_frames);
-      for (const unsigned char *p = buffer; total_frames > 0;) {
-         const size_t todo_frames = MIN(max_frames, total_frames);
-         assert(todo_frames <= total_frames);
-         total_frames -= todo_frames;
+   unsigned char decoded[16384], encoded[sizeof(decoded)];
+   const size_t dec_frames = sizeof(decoded) / (params[di].bps * chans);
+   const size_t enc_frames = sizeof(encoded) / (params[ei].bps * chans);
+   const size_t max_frames = MIN(dec_frames, enc_frames);
+
+   struct conv dec, enc;
+   dec_init(&dec, &params[di], chans);
+   enc_init(&enc, &params[ei], chans);
+
+   size_t io_bytes = 0;
+   for (size_t total_frames = frames; total_frames > 0;) {
+      size_t todo_frames = MIN(max_frames, total_frames);
+      assert(todo_frames <= total_frames);
+      total_frames -= todo_frames;
+
+      {
+         const size_t todo_bytes = todo_frames * (params[di].bps * chans);
+         const size_t ret = io->read(encoded, todo_bytes, arg) / (params[di].bps * chans);
+         assert(ret <= todo_frames);
+         todo_frames = ret;
 
          // sadly can't function pointer here as some formats may need different parameters for decoder
-         if (pcm->hw.format == SND_PCM_FORMAT_FLOAT_LE || pcm->hw.format == SND_PCM_FORMAT_FLOAT_BE) {
-            dec_do_float(&dec, (void*)p, decoded, todo_frames);
+         if (ei && (pcm->hw.format == SND_PCM_FORMAT_FLOAT_LE || pcm->hw.format == SND_PCM_FORMAT_FLOAT_BE)) {
+            dec_do_float(&dec, encoded, decoded, todo_frames);
          } else {
-            dec_do(&dec, (void*)p, decoded, todo_frames);
+            dec_do(&dec, encoded, decoded, todo_frames);
          }
-
-         enc_do(&enc, decoded, encoded, todo_frames);
-
-         const size_t todo_bytes = todo_frames * (params[1].bps * chans);
-         io_bytes += io(pcm->hdl, encoded, todo_bytes, arg);
-         p += todo_bytes;
       }
 
-      return io_bytes;
+      {
+         const size_t todo_bytes = todo_frames * (params[ei].bps * chans);
+
+         // sadly can't function pointer here as some formats may need different parameters for decoder
+         if (di && (pcm->hw.format == SND_PCM_FORMAT_FLOAT_LE || pcm->hw.format == SND_PCM_FORMAT_FLOAT_BE)) {
+            enc_do_float(&enc, decoded, encoded, todo_frames);
+         } else {
+            enc_do(&enc, decoded, encoded, todo_frames);
+         }
+
+         io_bytes += io->write(encoded, todo_bytes, arg);
+      }
    }
 
-   return io(pcm->hdl, buffer, snd_pcm_frames_to_bytes(pcm, frames), arg);
+   return io_bytes;
 }
 
 static size_t
-cb_write(struct sio_hdl *hdl, const void *buffer, size_t bytes, void *arg)
+cb_buffer_read(void *buffer, size_t bytes, void *arg)
 {
-   return sio_write(hdl, buffer, bytes);
+   struct io_state *state = arg;
+   assert(state->ptr + bytes <= state->end);
+   memcpy(buffer, state->ptr, bytes);
+   state->ptr += bytes;
+   return bytes;
+}
+
+static size_t
+cb_sio_write(const void *buffer, size_t bytes, void *arg)
+{
+   struct io_state *state = arg;
+   return sio_write(state->pcm->hdl, buffer, bytes);
 }
 
 snd_pcm_sframes_t
@@ -413,25 +448,37 @@ snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
       return 0;
    }
 
-   const snd_pcm_uframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, buffer, size, cb_write, NULL));
+   const struct io io = { .read = cb_buffer_read, .write = cb_sio_write };
+   struct io_state state = { .pcm = pcm, .ptr = buffer, .end = (unsigned char*)buffer + snd_pcm_frames_to_bytes(pcm, size) };
+
+   snd_pcm_uframes_t ret;
+   if (pcm->hw.needs_conversion) {
+      ret = snd_pcm_bytes_to_frames(pcm, convert(pcm, size, &io, &state));
+   } else {
+      ret = snd_pcm_bytes_to_frames(pcm, io.write(buffer, snd_pcm_frames_to_bytes(pcm, size), &state));
+   }
+
    assert(pcm->avail >= ret);
    pcm->written += ret;
    pcm->avail -= ret;
    return ret;
 }
 
-struct transformation {
-   unsigned char *ptr, *end;
-};
+static size_t
+cb_buffer_write(const void *buffer, size_t bytes, void *arg)
+{
+   struct io_state *state = arg;
+   assert(state->ptr + bytes <= state->end);
+   memcpy((void*)state->ptr, buffer, bytes);
+   state->ptr += bytes;
+   return bytes;
+}
 
 static size_t
-cb_transform(struct sio_hdl *hdl, const void *buffer, size_t bytes, void *arg)
+cb_sio_read(void *buffer, size_t bytes, void *arg)
 {
-   struct transformation *trans = arg;
-   assert(trans->ptr + bytes <= trans->end);
-   memcpy(trans->ptr, buffer, bytes);
-   trans->ptr += bytes;
-   return bytes;
+   struct io_state *state = arg;
+   return sio_read(state->pcm->hdl, buffer, bytes);
 }
 
 snd_pcm_sframes_t
@@ -442,13 +489,16 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
       return 0;
    }
 
-   // FIXME: should read to own buffer, as read may not fit
-   assert(pcm->hw.par.bps == (unsigned int)snd_pcm_format_physical_width(pcm->hw.format) / 8);
-   const size_t bpf = (pcm->hw.par.bps * pcm->hw.par.rchan);
-   const size_t bytes = sio_read(pcm->hdl, buffer, size * bpf);
+   const struct io io = { .read = cb_sio_read, .write = cb_buffer_write };
+   struct io_state state = { .pcm = pcm, .ptr = buffer, .end = (unsigned char*)buffer + snd_pcm_frames_to_bytes(pcm, size) };
 
-   struct transformation trans = { .ptr = buffer, .end = (unsigned char*)buffer + bytes };
-   const snd_pcm_uframes_t ret = snd_pcm_bytes_to_frames(pcm, io_do(pcm, buffer, bytes / bpf, cb_transform, &trans));
+   snd_pcm_uframes_t ret;
+   if (pcm->hw.needs_conversion) {
+      ret = snd_pcm_bytes_to_frames(pcm, convert(pcm, size, &io, &state));
+   } else {
+      ret = snd_pcm_bytes_to_frames(pcm, io.read(buffer, snd_pcm_frames_to_bytes(pcm, size), &state));
+   }
+
    assert(pcm->avail >= ret);
    pcm->written += ret;
    pcm->avail -= ret;
