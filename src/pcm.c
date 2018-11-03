@@ -47,6 +47,19 @@ format_info_for_sio_enc(const struct sio_enc *enc)
 }
 
 const struct format_info*
+format_info_for_sio_par(const struct sio_par *par)
+{
+   const struct sio_enc enc = {
+      .bits = par->bits,
+      .bps = par->bps,
+      .sig = par->sig,
+      .le = par->le,
+      .msb = (par->bps == SIO_BPS(par->bits) ? 1 : par->msb),
+   };
+   return format_info_for_sio_enc(&enc);;
+}
+
+const struct format_info*
 format_info_for_format(const snd_pcm_format_t format)
 {
    for (size_t i = 0; i < ARRAY_SIZE(SUPPORTED_FORMATS); ++i) {
@@ -256,7 +269,8 @@ snd_pcm_open(snd_pcm_t **pcm, const char *name, snd_pcm_stream_t stream, int mod
       goto fail;
 
    dump_cap(name, &(*pcm)->hw.cap, &(*pcm)->hw.limits);
-   (*pcm)->hw.format = SND_PCM_FORMAT_UNKNOWN;
+   const struct format_info *info = format_info_for_sio_par(&(*pcm)->hw.par);
+   (*pcm)->hw.format = (info ? info->fmt : SND_PCM_FORMAT_UNKNOWN);
    (*pcm)->hw.period_time = -1;
    return 0;
 
@@ -872,6 +886,13 @@ has_native_support(const snd_pcm_hw_params_t *params, snd_pcm_format_t val)
          return true;
    }
    return false;
+}
+
+int
+snd_pcm_hw_params_get_format(const snd_pcm_hw_params_t *params, snd_pcm_format_t *val)
+{
+   *val = params->format;
+   return 0;
 }
 
 int
