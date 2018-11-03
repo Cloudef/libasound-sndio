@@ -1154,7 +1154,9 @@ snd_pcm_hw_params_set_periods_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, 
       WARNX("%u", *val);
       unsigned int round = params->par.appbufsz / *val;
       assert(sizeof(params->par.round) == sizeof(round));
-      return update(pcm, &params->par, &params->par.round, &round, sizeof(*val));
+      const int ret = update(pcm, &params->par, &params->par.round, &round, sizeof(*val));
+      *val = params->par.appbufsz / params->par.round;
+      return ret;
    }
    return 0;
 }
