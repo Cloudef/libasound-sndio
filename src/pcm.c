@@ -1049,6 +1049,19 @@ snd_pcm_hw_params_get_buffer_size_max(const snd_pcm_hw_params_t *params, snd_pcm
 }
 
 int
+snd_pcm_hw_params_set_buffer_time_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
+{
+   if (dir) *dir = 0;
+   if (val) {
+      WARNX("%u", *val);
+      snd_pcm_uframes_t newv = MAX((*val * params->par.rate) / (uint64_t)1e6, params->par.round * 2);
+      snd_pcm_hw_params_set_buffer_size_near(pcm, params, &newv);
+      *val = (newv * (uint64_t)1e6) / params->par.rate;
+   }
+   return 0;
+}
+
+int
 snd_pcm_hw_params_get_period_size(const snd_pcm_hw_params_t *params, snd_pcm_uframes_t *val, int *dir)
 {
    if (dir) *dir = 0;
