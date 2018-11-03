@@ -1090,16 +1090,17 @@ snd_pcm_hw_params_get_period_size_max(const snd_pcm_hw_params_t *params, snd_pcm
 int
 snd_pcm_hw_params_set_period_time(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int val, int dir)
 {
-   WARNX("%u", val);
-   params->period_time = val / (uint64_t)1e3;
-   return 0;
+   return snd_pcm_hw_params_set_period_time_near(pcm, params, &val, &dir);
 }
 
 int
 snd_pcm_hw_params_set_period_time_near(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, unsigned int *val, int *dir)
 {
    if (dir) *dir = 0;
-   if (val) snd_pcm_hw_params_set_period_time(pcm, params, *val, 0);
+   if (val) {
+      WARNX("%u", *val);
+      params->period_time = *val / (uint64_t)1e3;
+   }
    return 0;
 }
 
