@@ -6,6 +6,11 @@
 #include "util/dsp.h"
 #include "util/util.h"
 
+static const snd_pcm_access_t SUPPORTED_ACCESS[] = {
+   SND_PCM_ACCESS_MMAP_INTERLEAVED,
+   SND_PCM_ACCESS_RW_INTERLEAVED
+};
+
 static const struct format_info {
    const char *name;
    snd_pcm_format_t fmt;
@@ -116,6 +121,10 @@ struct _snd_pcm {
    struct _snd_pcm_hw_params hw;
    struct _snd_pcm_sw_params sw;
    struct timespec start_time;
+   struct {
+      snd_pcm_channel_area_t areas[NCHAN_MAX];
+      unsigned char *data;
+   } mmap;
    struct sio_hdl *hdl;
    const char *name;
    snd_pcm_uframes_t position, written, avail;
@@ -260,6 +269,7 @@ int
 snd_pcm_close(snd_pcm_t *pcm)
 {
    sio_close(pcm->hdl);
+   free(pcm->mmap.data);
    free(pcm);
    return 0;
 }
@@ -499,10 +509,46 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
       ret = snd_pcm_bytes_to_frames(pcm, io.read(buffer, snd_pcm_frames_to_bytes(pcm, size), &state));
    }
 
+   static size_t old_ret;
+   if (ret != old_ret) {
+      WARNX("%lu %lu %lu", pcm->avail, size, ret);
+      old_ret = ret;
+   }
+
    assert(pcm->avail >= ret);
    pcm->written += ret;
    pcm->avail -= ret;
    return ret;
+}
+
+int
+snd_pcm_mmap_begin(snd_pcm_t *pcm, const snd_pcm_channel_area_t **areas, snd_pcm_uframes_t *offset, snd_pcm_uframes_t *frames)
+{
+   snd_pcm_uframes_t todo_frames = pcm->avail;
+   if (frames) todo_frames = MIN(todo_frames, *frames);
+
+   if (pcm->hw.stream == SND_PCM_STREAM_CAPTURE)
+      todo_frames = snd_pcm_readi(pcm, pcm->mmap.data, todo_frames);
+
+   if (offset) *offset = 0;
+   if (frames) *frames = todo_frames;
+   if (areas) {
+      const unsigned int chans = (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK ? pcm->hw.par.pchan : pcm->hw.par.rchan);
+      for (unsigned int i = 0; i < chans; ++i)
+         pcm->mmap.areas[i].addr = pcm->mmap.data + snd_pcm_format_size(pcm->hw.format, todo_frames) * i;
+      *areas = pcm->mmap.areas;
+   }
+
+   return 0;
+}
+
+snd_pcm_sframes_t
+snd_pcm_mmap_commit(snd_pcm_t *pcm, snd_pcm_uframes_t offset, snd_pcm_uframes_t frames)
+{
+   if (pcm->hw.stream == SND_PCM_STREAM_PLAYBACK)
+      return snd_pcm_writei(pcm, pcm->mmap.data, frames);
+
+   return frames;
 }
 
 static uint64_t
@@ -692,6 +738,22 @@ out:
    return ret;
 }
 
+static bool
+is_mmap_access(const snd_pcm_access_t access)
+{
+   return (access == SND_PCM_ACCESS_MMAP_INTERLEAVED || access == SND_PCM_ACCESS_MMAP_NONINTERLEAVED || access == SND_PCM_ACCESS_MMAP_COMPLEX);
+}
+
+static void
+ensure_mmap_buffer(snd_pcm_t *pcm)
+{
+   free(pcm->mmap.data);
+   pcm->mmap.data = NULL;
+
+   if (is_mmap_access(pcm->hw.access) && !(pcm->mmap.data = calloc(1, snd_pcm_frames_to_bytes(pcm, pcm->hw.par.bufsz))))
+      ERR1(EXIT_FAILURE, "realloc");
+}
+
 int
 snd_pcm_hw_params(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 {
@@ -704,6 +766,7 @@ snd_pcm_hw_params(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 
       WARNX("set: rate: %u, round: %u, appbufsz: %u chan: %u", params->par.rate, params->par.round, params->par.appbufsz, (params->stream == SND_PCM_STREAM_PLAYBACK ? params->par.pchan : params->par.rchan));
       pcm->hw = *params;
+      ensure_mmap_buffer(pcm);
    }
 
    return snd_pcm_prepare(pcm);
@@ -726,17 +789,20 @@ snd_pcm_hw_params_any(snd_pcm_t *pcm, snd_pcm_hw_params_t *params)
 int
 snd_pcm_hw_params_test_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access)
 {
-   if (_access != SND_PCM_ACCESS_RW_INTERLEAVED) {
-      WARNX("access mode `0x%x` not supported yet", _access);
-      return -1;
+   for (size_t i = 0; i < ARRAY_SIZE(SUPPORTED_ACCESS); ++i) {
+      if (SUPPORTED_ACCESS[i] == _access)
+         return 0;
    }
 
-   return 0;
+   WARNX("access mode `0x%x` not supported yet", _access);
+   return -1;
 }
 
 int
 snd_pcm_hw_params_set_access(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pcm_access_t _access)
 {
+   WARNX("0x%x", _access);
+
    if (snd_pcm_hw_params_test_access(pcm, params, _access) != 0)
       return -1;
 

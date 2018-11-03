@@ -645,8 +645,6 @@ int snd_pcm_dump_setup(snd_pcm_t *pcm, snd_output_t *out) { WARNX1("stub"); retu
 int snd_pcm_hw_params_dump(snd_pcm_hw_params_t *params, snd_output_t *out) { WARNX1("stub"); return 0; }
 int snd_pcm_sw_params_dump(snd_pcm_sw_params_t *params, snd_output_t *out) { WARNX1("stub"); return 0; }
 int snd_pcm_status_dump(snd_pcm_status_t *status, snd_output_t *out) { WARNX1("stub"); return 0; }
-int snd_pcm_mmap_begin(snd_pcm_t *pcm, const snd_pcm_channel_area_t **areas, snd_pcm_uframes_t *offset, snd_pcm_uframes_t *frames) { WARNX1("stub"); return 0; }
-snd_pcm_sframes_t snd_pcm_mmap_commit(snd_pcm_t *pcm, snd_pcm_uframes_t offset, snd_pcm_uframes_t frames) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_mmap_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_mmap_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size) { WARNX1("stub"); return 0; }
 snd_pcm_sframes_t snd_pcm_mmap_writen(snd_pcm_t *pcm, void **bufs, snd_pcm_uframes_t size) { WARNX1("stub"); return 0; }

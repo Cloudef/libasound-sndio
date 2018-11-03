@@ -22,6 +22,7 @@ do_debug(void)
 #define WARNX(x, ...) do { if (do_debug()) warnx("asound: %s " x, __func__, ##__VA_ARGS__); } while (0)
 #define ERRX1(x, y) do { errx(x, "asound: %s %s", __func__, y); } while (0)
 #define ERRX(x, y, ...) do { errx(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
+#define ERR1(x, y) do { err(x, "asound: %s %s", __func__, y); } while (0)
 #define ERR(x, y, ...) do { err(x, "asound: %s " y, __func__, ##__VA_ARGS__); } while (0)
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
