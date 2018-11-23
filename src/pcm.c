@@ -307,7 +307,9 @@ snd_pcm_nonblock(snd_pcm_t *pcm, int nonblock)
    if (!(pcm->hdl = device_open(pcm, pcm->name, pcm->hw.stream, (nonblock ? SND_PCM_NONBLOCK : false))))
       return -1;
 
-   return snd_pcm_hw_params(pcm, &pcm->hw);
+   snd_pcm_hw_params_t params = pcm->hw;
+   pcm->hw = (snd_pcm_hw_params_t){0};
+   return snd_pcm_hw_params(pcm, &params);
 }
 
 int
