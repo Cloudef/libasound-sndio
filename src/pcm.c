@@ -444,7 +444,7 @@ convert(snd_pcm_t *pcm, const size_t frames, const struct io *io, void *arg)
       }
    }
 
-   return io_bytes;
+   return io_bytes / (params[ei].bps * chans);
 }
 
 static size_t
@@ -482,7 +482,7 @@ snd_pcm_writei(snd_pcm_t *pcm, const void *buffer, snd_pcm_uframes_t size)
 
    snd_pcm_uframes_t ret;
    if (pcm->hw.needs_conversion) {
-      ret = snd_pcm_bytes_to_frames(pcm, convert(pcm, size, &io, &state));
+      ret = convert(pcm, size, &io, &state);
    } else {
       ret = snd_pcm_bytes_to_frames(pcm, io.write(buffer, snd_pcm_frames_to_bytes(pcm, size), &state));
    }
@@ -528,7 +528,7 @@ snd_pcm_readi(snd_pcm_t *pcm, void *buffer, snd_pcm_uframes_t size)
 
    snd_pcm_uframes_t ret;
    if (pcm->hw.needs_conversion) {
-      ret = snd_pcm_bytes_to_frames(pcm, convert(pcm, size, &io, &state));
+      ret = convert(pcm, size, &io, &state);
    } else {
       ret = snd_pcm_bytes_to_frames(pcm, io.read(buffer, snd_pcm_frames_to_bytes(pcm, size), &state));
    }
