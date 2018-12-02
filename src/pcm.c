@@ -913,7 +913,7 @@ snd_pcm_hw_params_set_format(snd_pcm_t *pcm, snd_pcm_hw_params_t *params, snd_pc
       WARNX1("format needs to be transcoded!");
 
    const struct sio_par old = params->par;
-   params->par.bits = info->enc.bits;
+   params->par.bits = MIN(info->enc.bits, 24);
    params->par.bps = info->enc.bps;
    params->par.sig = info->enc.sig;
    params->par.le = (params->needs_conversion ? SIO_LE_NATIVE : info->enc.le);
