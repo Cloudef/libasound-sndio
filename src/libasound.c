@@ -46,7 +46,7 @@ snd_strerror(int errnum)
 {
    // Do not bother implementing this, just WARN/ERR directly in this lib
    // Letting applications show useful error messages never works out
-   return "set env variable `LIBASOUND_DEBUG` to 1 for more information";
+   return "set env variable `ASOUND_DEBUG` to 1 for more information";
 }
 
 snd_lib_error_handler_t snd_lib_error;
