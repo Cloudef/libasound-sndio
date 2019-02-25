@@ -8,8 +8,9 @@ MAKEFLAGS += --no-builtin-rules
 WARNINGS := -Wall -Wextra -Wpedantic -Wformat=2 -Wstrict-aliasing=3 -Wstrict-overflow=5 -Wstack-usage=64000 \
 	-Wfloat-equal -Wcast-align -Wpointer-arith -Wchar-subscripts -Warray-bounds=2
 
-override CFLAGS ?= -g
-override CFLAGS += -std=c11 $(WARNINGS)
+override CFLAGS ?= -g -O2 $(WARNINGS)
+override CFLAGS += -std=c11
+override CPPFLAGS ?= -D_FORTIFY_SOURCE=2
 override CPPFLAGS += -Iinclude
 override LDFLAGS += -fPIC
 
