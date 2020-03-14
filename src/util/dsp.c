@@ -16,7 +16,6 @@
  */
 #include <string.h>
 #include "dsp.h"
-#include "utils.h"
 
 int aparams_ctltovol[128] = {
 	    0,
